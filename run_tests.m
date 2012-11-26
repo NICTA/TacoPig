@@ -1,1 +1,1 @@
-runtests tacopig_tests -xmlfile testreport.xml
+runtests tacopig_tests
