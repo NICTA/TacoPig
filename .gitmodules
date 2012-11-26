@@ -1,0 +1,3 @@
+[submodule "matlab-xunit-doctest"]
+	path = matlab-xunit-doctest
+	url = git@github.com:tgs/matlab-xunit-doctest.git
