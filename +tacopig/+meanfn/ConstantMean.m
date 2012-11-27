@@ -1,8 +1,6 @@
-% Matrix GP Mean Function
-% This is a constant mean fixed pre-learning, not a stationary mean (which would have
-% a parameter)
-
-classdef GP_ConstantMean < GP_MeanFunc
+% ConstantMean
+% GP mean function with no parameters. Always returns its member 'value'.
+classdef ConstantMean < tacopig.meanfn.MeanFunc
 
     % Protected member variables:
     properties
@@ -17,7 +15,7 @@ classdef GP_ConstantMean < GP_MeanFunc
     
     methods
         % Constructor: default to zero mean
-        function this = GP_ConstantMean(val)
+        function this = ConstantMean(val)
            this.value = 0;
            if nargin > 0
                this.value = val';
@@ -34,7 +32,7 @@ classdef GP_ConstantMean < GP_MeanFunc
             end
         end
         
-        function g = gradient(this, X, par)
+        function g = gradient(this,X,par)
             g = []; % we dont have any parameters...
         end
         

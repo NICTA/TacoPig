@@ -1,4 +1,4 @@
-classdef GP_StatNoise < GP_NoiseFunc
+classdef Stationary < tacopig.noisefn.NoiseFunc
    
     % Most noise functions will be static
     methods(Static) 

@@ -1,0 +1,9 @@
+Most critical to explore:
+
+sqexp
+
+covsum
+
+clamped parameters
+
+multi task

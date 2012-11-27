@@ -1,4 +1,4 @@
-function [nlml, nlmlg] = GP_LMLG_FN(this, parvec)
+function [nlml, nlmlg] = NLML(this, parvec)
             
             % Special case: Multi-task
             if isa(this,'GP_MultiTask')
@@ -41,7 +41,7 @@ function [nlml, nlmlg] = GP_LMLG_FN(this, parvec)
             %end
             
             K = K + noise;
-            mu = this.MeanFn.eval_y(this.X, meanpar); 
+            mu = this.MeanFn.eval(this.X, meanpar); 
             ym = this.y-mu;
             
             
@@ -90,19 +90,8 @@ function [nlml, nlmlg] = GP_LMLG_FN(this, parvec)
                 %Noise gradient
                 for i = 1:length(noisegrad)
                     nlmlg(ncovpar+nmeanpar+i) = 0.5*sum(sum(W.*noisegrad{i}));
-                    % simon version ... 0.5*trace(W*noisegrad{i});
-%                     Original ... 0.5*trace(W*noisepar);
                 end
-                
-                
-                if (this.spit_out_gradients)
-                    this.gcount = this.gcount + 1;
-                    if (this.gcount>8)
-                        this.gcount = 0;
-                        parvec
-                        this.check_gradients(parvec);
-                    end
-                end
+               
             end
           
            

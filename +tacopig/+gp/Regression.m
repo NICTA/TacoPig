@@ -1,6 +1,6 @@
 % A standard GP-regression model
 
-classdef GP_STD < GP_Model
+classdef Regression < tacopig.gp.GpCore
     
     properties
         mu              % Evaluated Mean
@@ -21,14 +21,15 @@ classdef GP_STD < GP_Model
         
     end
     
+    
     methods
         
         % Constructor
-        function this = GP_STD()
+        function this = Regression()
              this.opts =  optimset('LargeScale','off','MaxIter',1000,'Diagnostics', 'on',...
                  'GradObj', 'on', 'Display', 'iter','TolFun',  1e-10, 'MaxFunEvals', 5000);
-             this.factorisation = 'SVD';
-             this.objective_function = @GP_LMLG_FN;
+             this.factorisation = 'CHOL';
+             this.objective_function = @tacopig.objectivefn.NLML;
              this.solver_function = @fminunc;
              this.has_been_solved = 0;
         end
@@ -48,7 +49,7 @@ classdef GP_STD < GP_Model
 % Solve for K, lml, etc.          
         function solve(this)
             this.check();
-            mu = this.MeanFn.eval_y(this.X, this.meanpar);
+            mu = this.MeanFn.eval(this.X, this.meanpar);
             K0 = this.CovFn.Keval(this.X, this.covpar);
             noise = this.NoiseFn.eval(this, this.noisepar);
             ym = (this.y - mu)';
@@ -76,7 +77,7 @@ classdef GP_STD < GP_Model
             
             this.K = K; 
             this.mu = mu;
-            this.lml = -GP_LMLG_FN(this, [this.meanpar, this.covpar, this.noisepar]);
+            this.lml = -tacopig.objectivefn.NLML(this, [this.meanpar, this.covpar, this.noisepar]);
             this.has_been_solved = 1;
         end
         
@@ -176,10 +177,8 @@ classdef GP_STD < GP_Model
         
 % Learn the hyperparameters        
         function theta = learn(this)
-            if (~this.check())
-                error('Abort.');
-            end
-            
+            this.check();
+
             %Matlab optimisation toolbox
             par0 = [this.meanpar, this.covpar, this.noisepar];
             [par,fval] = this.solver_function(@(theta) this.objectfun(theta), par0, this.opts);
@@ -192,14 +191,12 @@ classdef GP_STD < GP_Model
             this.meanpar = par(1:nmeanpar);
             this.covpar = par(nmeanpar+(1:ncovpar));
             this.noisepar = par(ncovpar+nmeanpar+(1:nnoisepar));
-            this.lml = -GP_LMLG_FN(this,par);
+            this.lml = - tacopig.objectivefn.NLML(this,par);
         end
         
 % Sample from the prior distribution        
         function [f_star] = sampleprior(this, x_star)
-            if (~this.check())
-                error('Abort.');
-            end
+            this.check();
             nx = size(x_star,2);  
             if nx>20000
                 disp(['Warning: Large number of query points.'...
@@ -216,9 +213,7 @@ classdef GP_STD < GP_Model
        
 % Sample from the posterior distribution        
         function [f_star] = sampleposterior(this, x_star)
-            if (~this.check())
-                error('Abort.');
-            end
+            this.check();
             
             if (~this.has_been_solved)
                 error('GP must be solved first using GP.solve().');
@@ -260,9 +255,9 @@ classdef GP_STD < GP_Model
             use_chol = strcmpi(this.factorisation, 'chol');
             if ((use_svd==0)&&(use_chol==0))
                 error('Matrix factorisation should either be SVD or CHOL\n');
-            elseif ~isa(this.MeanFn,'GP_MeanFunc')
+            elseif ~isa(this.MeanFn,'tacopig.meanfn.MeanFunc')
                 error('Not a valid Mean Function\n');
-            elseif ~isa(this.CovFn,'GP_CovFunc')
+            elseif ~isa(this.CovFn,'tacopig.covfn.CovFunc')
                 error('Not a valid Covariance Function\n');
             elseif (size(this.y,1) ~= 1)
                 error('Y is transposed?\n');

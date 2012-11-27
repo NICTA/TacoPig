@@ -1,4 +1,4 @@
-classdef SqExp < tacopig.CovFn.CovFunc
+classdef SqExp < tacopig.covfn.CovFunc
    
     % Most covariance functions will be static
     methods(Static) 
@@ -36,7 +36,7 @@ classdef SqExp < tacopig.CovFn.CovFunc
         function [g] = gradient(X, par)
             
             % Same as K?
-            Kg = GP_SqExpCov.eval(X, X, par);
+            Kg = tacopig.covfn.SqExp.eval(X, X, par);
             
             [d,n] = size(X);
             g = cell(1,d+1);
