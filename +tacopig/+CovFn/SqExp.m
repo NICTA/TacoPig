@@ -1,9 +1,15 @@
-classdef GP_SqExpCov < GP_CovFunc
+classdef SqExp < tacopig.CovFn.CovFunc
    
     % Most covariance functions will be static
     methods(Static) 
         
         function n_theta = npar(D)
+            if D <= 0
+              error('tacopig:inputOutOfRange', 'Dimension cannot be < 1');
+            end
+            if mod(D,1) ~= 0
+              error('tacopig:inputInvalidType', 'Dimension must be an integer');
+            end
             n_theta = D+1; % each dimension + signal variance
         end
         
@@ -11,10 +17,10 @@ classdef GP_SqExpCov < GP_CovFunc
             [D,N1] = size(X1); %number of points in X1
             N2 = size(X2,2); %number of points in X2
             if D~=size(X2,1)
-                error('Dimensionality of X1 and X2 must be the same');
+                error('tacopig:dimMismatch','Dimensionality of X1 and X2 must be the same');
             end
             if (length(par)~=D+1)
-                error('Wrong number of hyperparameters for SqExp');
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters for SqExp');
             end
             %Compute weighted squared distances:
             w = par(1:D)'.^(-2);

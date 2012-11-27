@@ -1,6 +1,6 @@
 % Covariance Function Abstract Class
 
-classdef GP_CovFunc < handle
+classdef CovFunc < handle
     
     methods (Abstract)
         % Automatically report hyperparameter dimensionality

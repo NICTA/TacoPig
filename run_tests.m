@@ -1,1 +1,0 @@
-runtests tacopig_tests
