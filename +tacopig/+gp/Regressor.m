@@ -1,31 +1,30 @@
 % A standard GP-regression model
 
-classdef Regression < tacopig.gp.GpCore
+classdef Regressor < tacopig.gp.GpCore
     
     properties
-        mu              % Evaluated Mean
-        K               % Evaluated Covariance Matrix
-        meanpar         % Mean Function Parameters
-        covpar          % Covariance Function Parameters
-        noisepar        % Noise Function Parameters
-        alpha           % cached K^-1y
-        opts            % Optimiser options vector
+        mu                  % Evaluated Mean
+        K                   % Evaluated Covariance Matrix
+        meanpar             % Mean Function Parameters
+        covpar              % Covariance Function Parameters
+        noisepar            % Noise Function Parameters
+        alpha               % cached K^-1y
+        opts                % Optimiser options vector
         
-        factorisation   % Factorisation method for inference
-        factors         % Factors produced by the factorisation
-        has_been_solved 
+        objective_function  % optimisation criteria for learning
+        solver_function     % External optimisation toolbox function
+        factorisation       % Factorisation method for inference
         
-        lml
-        objective_function
-        solver_function
-        
+        factors             % Factors produced by the factorisation
+        has_been_solved     % Flag to stop premature querying of a model
+        lml                 % log marginal likelihood of training data
     end
     
-    
+   
     methods
         
         % Constructor
-        function this = Regression()
+        function this = Regressor()
              this.opts =  optimset('LargeScale','off','MaxIter',1000,'Diagnostics', 'on',...
                  'GradObj', 'on', 'Display', 'iter','TolFun',  1e-10, 'MaxFunEvals', 5000);
              this.factorisation = 'CHOL';
@@ -34,7 +33,7 @@ classdef Regression < tacopig.gp.GpCore
              this.has_been_solved = 0;
         end
         
-% Access to optimisation settings
+        % Provide convenient access to optimisation settings
         function optimset(varargin)
             this = varargin{1};
             this.opts = optimset(this.opts, varargin{2:end});
@@ -44,17 +43,21 @@ classdef Regression < tacopig.gp.GpCore
             out = optimget(this.opts, varargin{2:end});
         end
         
-        
-        
-% Solve for K, lml, etc.          
+        % Run the GP Inference
         function solve(this)
-            this.check();
+
+            % Check validity of current configuration
+            this.check(); 
+            
+            % Invoke the components
             mu = this.MeanFn.eval(this.X, this.meanpar);
             K0 = this.CovFn.Keval(this.X, this.covpar);
             noise = this.NoiseFn.eval(this, this.noisepar);
-            ym = (this.y - mu)';
-            K = K0 + noise;
             
+            K = K0 + noise;
+            ym = (this.y - mu)';
+            
+            % We offer different factorisation methods
             if strcmpi(this.factorisation, 'svd')
                 [U,S,V] = svd(K);
                 S2 = diag(S);
@@ -65,125 +68,139 @@ classdef Regression < tacopig.gp.GpCore
                 this.factors.SVD_U = U;
                 this.factors.SVD_S = S;
                 this.factors.SVD_V = V;
+                this.factors.type = 'svd';
             elseif strcmpi(this.factorisation, 'chol')
                 L = chol(K, 'lower');
                 this.alpha = L'\(L\ym);
                 this.K = K; 
                 this.factors.L = L;
+                this.factors.type = 'chol';
                 this.mu = mu;
             else
-                error('Invalid factorisation!');    
+                error('tacopig:badConfiguration','Invalid factorisation method.');    
             end
             
+            % Save the solved outputs:
             this.K = K; 
             this.mu = mu;
             this.lml = -tacopig.objectivefn.NLML(this, [this.meanpar, this.covpar, this.noisepar]);
             this.has_been_solved = 1;
         end
+
         
-        
-% Query the model               
-        function [mu_star, var_star, var_full] = query(this, x_star)
-            if (~this.has_been_solved)
-                error('GP must be solved first using GP.solve.');
-            end
+        % Query the model after it has been solved
+        function [mu_star, var_star, var_full] = query(this, x_star, batches)
             
+            % The user can (optionally) split the data into batches)
+            if (nargin<3)
+                batches = 1;
+            end
+            if (~this.has_been_solved)
+                error('tacopig:badConfiguration', 'GP must be solved first using GP.solve.');
+            end
             this.check();
-                            
+            
+            % Get input lengths
             N = size(this.X,2); 
             nx = size(x_star,2);
-
-            array_limit = 10*1024*1024/8; % number of doubles in 10mb
             
-            if (N*nx>array_limit)
-                large_query = true;
-                fprintf('Evaluating query points in 10mb batches:\n')
-            else
-                large_query = false;
+            if abs(round(batches)-batches)>1e-16
+                error('tacopig:inputInvalidType', 'Batches must be an integer');
+            end
+            batches = round(batches);
+            % The user can also (optionally get the full variance 
+            if (nargout==3)
+                % provided they havent split the data
+                if (batches > 1)
+                    error('tacopig:badConfiguration', 'Cannot obtain full variance in batches');
+                end
+                
+                if (nx>2000)
+                    disp(['Warning: Large number of query points.'...
+                        'This may result in considerable computational time.'...
+                        'Press Ctrl+C to abort or any other key to continue.'])
+                    pause
+                end
+                
             end
             
-            mu_star   = zeros(1,nx);
+            
+            mu_star = zeros(1,nx);
             if (nargout>1) 
                 var_star   = zeros(1,nx);
-            end
-            ee   = 0; % loop counter
-
-            step = floor(array_limit/N);
-            if (step==0)
-                warning('X is very large - querying single file.\n');
-                step = 1;
             end
                         
             use_svd = false;
             use_chol = false;
-            if strcmpi(this.factorisation, 'svd')
-                % Cache - common to all queries
-                S2 = sqrt(this.factors.S2);
+            if strcmpi(this.factors.type, 'svd')
+                factorS = sqrt(this.factors.S2);
                 use_svd = true;
-            elseif strcmpi(this.factorisation, 'chol')
+            elseif strcmpi(this.factors.type, 'chol')
                 use_chol = true;
             else
-                error('Invalid choice of factorisation method');
+                error('tacopig:badConfiguration', 'Factorization is not recognized.');
             end
             
             % we are currently handling the possibility of multi-task with
             % common points as a general case of GP_Std
             mu_0 = this.MeanFn.eval(x_star, this.meanpar);
-            uptomu0 = 1;
-            for i = 1:step:nx
-                % progress bar
-                if (large_query)
-                    fprintf('%d...',i);
-                end
-                LR = i:min(nx, i+step-1);
-                ks = this.CovFn.eval(this.X,x_star(:,LR),this.covpar)';
-                product = (ks*this.alpha)';
+            
+            partitions = round(linspace(1, nx+1, batches+1));
+            
+            for i = 1:batches
+                % Handle batches
+                L = partitions(i);
+                R = partitions(i+1)-1;
+                LR = L:R;
                 
-                nlr = size(LR,2);
-                nrep = size(ks,1)/nlr; % repetition of the input data...
-                mu_star(1:nrep,LR) = reshape(product, [nlr,nrep])';
-                mu_1 = reshape(mu_0, size(mu_star'))';
-                for j=1:nrep
-                    mu_star(j,LR) = mu_star(j,LR) + mu_1(j,LR);
+                % Progress Bar
+                if (batches>1)
+                    fprintf('%d to %d...\n',L, R);
                 end
-                % Realised a bug that mis-calculated the variance in this
-                % case...
-                if (nargout==2) 
+                
+                % Compute predictive mean
+                ks = this.CovFn.eval(this.X,x_star(:,LR),this.covpar)';
+                mu_star(LR) = mu_0(LR) + (ks*this.alpha)';
+
+                if (nargout>=2)
+                    % Compute predictive variance
                     var0 = this.CovFn.pointval(x_star(:,LR), this.covpar);
                     if use_svd
                         %S2 = S2(:,ones(1,size(x_star(:,LR),2)));
-                        v = bsxfun(@times, S2, (ks*this.factors.SVD_U)');
+                        v = bsxfun(@times, factorS, (ks*this.factors.SVD_U)');
                     elseif use_chol
                         v = this.factors.L\ks';
+                    else
+                        error('tacopig:badConfiguration', 'Factorization not implemented');
                     end
-                    predvar = max(0,var0 - sum(v.*v));
-                    var_star(1:nrep,LR) = reshape(predvar, [nlr,nrep])'; % is that more correct?
+                    var_star(LR) = max(0,var0 - sum(v.*v));
+                    
+                    if (nargout ==3)
+                        % we also want the block
+                        % Can only get here if batches is set to 1
+                        
+                        var0 = this.CovFn.Keval(x_star(:,LR), this.covpar);
+                        var_full = var0-v'*v;
+                    end
                 end
 
             end
-            fprintf('\n');
-            if (nargout ==3)
-                     var0 = this.CovFn.eval(x_star, x_star, this.covpar);
-                    if use_svd
-                        v = bsxfun(@times, S2, (ks*this.factors.SVD_U)');
-                    elseif use_chol
-                        v = this.factors.L\ks';
-                    end
-                    var_star = max(0,diag(var0)' - sum(v.*v));
-                    var_full = var0-v'*v;
-            end
         end
-          
         
-% Learn the hyperparameters        
+        % Learn the hyperparameters        
         function theta = learn(this)
+            
+            % Check configuration
             this.check();
 
-            %Matlab optimisation toolbox
+            % Pack hyperparameters into a single vector
             par0 = [this.meanpar, this.covpar, this.noisepar];
+            
+            % It is assumed the objective function is equivalent to fminunc
+            % Otherwise errors will be thrown
             [par,fval] = this.solver_function(@(theta) this.objectfun(theta), par0, this.opts);
              
-            % Unpack the parameters again to save them!   
+            % Unpack the parameters again to save them:   
             D = size(this.X,1);
             ncovpar = this.CovFn.npar(D);
             nmeanpar = this.MeanFn.npar(D);
@@ -194,24 +211,24 @@ classdef Regression < tacopig.gp.GpCore
             this.lml = - tacopig.objectivefn.NLML(this,par);
         end
         
-% Sample from the prior distribution        
+        
+        % Draw samples from the prior distribution        
         function [f_star] = sampleprior(this, x_star)
             this.check();
             nx = size(x_star,2);  
-            if nx>20000
+            if (nx>2000)
                 disp(['Warning: Large number of query points.'...
                     'This may result in considerable computational time.'...
                     'Press Ctrl+C to abort or any other key to continue.'])
                 pause
             end
-            f_star   = zeros(1,nx);
             Mu_0= this.MeanFn.eval(x_star, this.meanpar);
             kss = this.CovFn.eval(x_star,x_star,this.covpar);
-            Lss = chol(kss+eye(size(kss))*1e-10, 'lower');
+            Lss = chol(kss+diag(diag(kss))*1e-4, 'lower');
             f_star = [Lss*randn(1,nx)']'+Mu_0;
         end
        
-% Sample from the posterior distribution        
+        % Sample from the posterior distribution        
         function [f_star] = sampleposterior(this, x_star)
             this.check();
             
@@ -227,12 +244,9 @@ classdef Regression < tacopig.gp.GpCore
                     'Press Ctrl+C to abort or any other key to continue.'])
                 pause
             end
-            f_star = zeros(1,nx);
             [mu_star var_star var_full] = this.query(x_star);
-            LFull = chol(var_full+eye(size(var_full))*1e-8, 'lower');
-            fFull = [LFull*randn(1,nx)']';
-            f_star = fFull+mu_star;
-
+            LFull  = chol(var_full+diag(var_star)*1e-4, 'lower');
+            f_star = randn(1,nx)*LFull' +mu_star;
         end
         
         % Pass through objective function
@@ -246,7 +260,6 @@ classdef Regression < tacopig.gp.GpCore
             end
         end
         
-        
         % Check the inputs are of an appropriate form        
         function check(this)
             % Check that all the values are properly set
@@ -254,24 +267,24 @@ classdef Regression < tacopig.gp.GpCore
             use_svd = strcmpi(this.factorisation, 'svd');
             use_chol = strcmpi(this.factorisation, 'chol');
             if ((use_svd==0)&&(use_chol==0))
-                error('Matrix factorisation should either be SVD or CHOL\n');
+                error('tacopig:badConfiguration', 'Matrix factorisation should either be SVD or CHOL\n');
             elseif ~isa(this.MeanFn,'tacopig.meanfn.MeanFunc')
-                error('Not a valid Mean Function\n');
+                error('tacopig:badConfiguration', 'Invalid Mean Function\n');
             elseif ~isa(this.CovFn,'tacopig.covfn.CovFunc')
-                error('Not a valid Covariance Function\n');
+                error('tacopig:badConfiguration', 'Invalid Covariance Function\n');
             elseif (size(this.y,1) ~= 1)
-                error('Y is transposed?\n');
+                error('tacopig:dimMismatch', 'Y is transposed?\n');
             elseif (size(this.covpar,1) > 1)
-                error('covpar is transposed?\n');
+                error('tacopig:dimMismatch', 'Covpar is transposed?\n');
             end 
             ncovpar = this.CovFn.npar(D);
             nmeanpar = this.MeanFn.npar(D);
             if (size(this.covpar,2) ~= ncovpar)
-                error('covpar is the wrong length.');
+                error('tacopig:inputInvalidLength', 'covpar is the wrong length.');
             elseif (size(this.meanpar,1) > 1)
-                error('meanpar is transposed?');
+                error('tacopig:dimMismatch', 'meanpar is transposed?');
             elseif (size(this.meanpar,2) ~= nmeanpar)
-                error('meanpar is the wrong length.');
+                error('tacopig:inputInvalidLength', 'meanpar is the wrong length.');
             end
             return;
         end
@@ -280,18 +293,16 @@ classdef Regression < tacopig.gp.GpCore
         function [analytic, numerical] = check_gradients(this,params)
             
             if strcmpi(optimget(this.opts, 'GradObj'), 'off')
-                fprintf('You have gradients turned off...\n');
-                return;
+                error('tacopig:badConfiguration', 'Gradients are turned off.');
             end
             fprintf('Checking gradients:\n');
             
-        
             if (nargin==1)
                 params = [this.meanpar, this.covpar, this.noisepar];
             end
             
             eps = 1e-6;
-            [val0,analytic] = this.objective_function(this,params);
+            [~,analytic] = this.objective_function(this,params);
             numerical = zeros(size(params));
             for i = 1:length(params)
                params2 = params;
@@ -305,9 +316,6 @@ classdef Regression < tacopig.gp.GpCore
             analytic = analytic';
             fprintf('Analytic (top), Numerical (bottom)\n');
             disp([analytic;numerical]);
-            
-            %disp([analytic; numerical]);
-            
         end
     end
 end    

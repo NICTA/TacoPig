@@ -65,7 +65,7 @@ function [nlml, nlmlg] = NLML(this, parvec)
                 end
                 nlml = 0.5*(ym*alpha + 2*sum(log(diag(L))) + N*log(2*pi));
             else
-                error('Invalid factorisation choice');
+                error('tacopig:badConfiguration','Invalid factorisation choice');
             end
             
             %Compute the gradient for covariance hyperparameters

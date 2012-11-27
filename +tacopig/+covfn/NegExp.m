@@ -1,6 +1,5 @@
-classdef GP_ExpCov < GP_CovFunc
-   
-    % Most covariance functions will be static
+classdef NegExp < tacopig.covfn.CovFunc
+
     methods(Static) 
         
         function n_theta = npar(D)
@@ -31,7 +30,7 @@ classdef GP_ExpCov < GP_CovFunc
             %Gradient currently not working correctly.
             epsilon = 1e-10; 
             % Same as K?
-            [Kg z] = GP_ExpCov.eval(X, X, par);
+            [Kg z] = tacopig.covfn.NegExp.eval(X, X, par);
             z = z+epsilon*eye(size(z)); %jitter added to avoid divide by zero
             [d,n] = size(X);
             g = cell(1,d+1);

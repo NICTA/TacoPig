@@ -1,5 +1,8 @@
-% Allows a projection matrix like G to be applied around the kernel
-classdef GP_Remap < GP_CovFunc
+% Allows a re-ordering or repetition of hyperparameters
+% usage: Remap(covfn, index)
+% Eg. [1 1 2] would map optimisation vector [a b] into hyper vector [a a b]
+
+classdef Remap < tacopig.covfn.CovFunc
     
     properties
        indx
@@ -8,12 +11,11 @@ classdef GP_Remap < GP_CovFunc
     
     methods
         
-        function this = GP_Remap(covfn, indx)
+        function this = Remap(covfn, indx)
             
-           if ~isa(covfn,'GP_CovFunc')
+           if ~isa(covfn,'tacopig.covfn.CovFunc')
                error([class(this),': must specify a valid covariance function']); 
            end
-                      
            this.indx = indx;
            this.covfn = covfn;
         end   

@@ -11,10 +11,10 @@ classdef GP_Mat5Cov < GP_CovFunc
             [D,N1] = size(X1); %number of points in X1
             N2 = size(X2,2); %number of points in X2
             if D~=size(X2,1)
-                error('Dimensionality of X1 and X2 must be the same');
+                error('tacopig:dimMismatch','Dimensionality of X1 and X2 must be the same');
             end
             if (length(par)~=D+1)
-                error('Wrong number of hyperparameters for SqExp');
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters for SqExp');
             end
             %Compute weighted squared distances:
             w = par(1:D)'.^(-2);

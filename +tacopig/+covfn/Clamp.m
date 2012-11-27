@@ -1,5 +1,5 @@
 % Allows a projection matrix like G to be applied around the kernel
-classdef GP_ClampCov < GP_CovFunc
+classdef Clamp < tacopig.covfn.CovFunc
     
     properties
        indx
@@ -9,11 +9,10 @@ classdef GP_ClampCov < GP_CovFunc
     
     methods
         
-        function this = GP_ClampCov(covfn, indx, value)
-           if ~isa(covfn,'GP_CovFunc')
-               error([class(this),': must specify a valid covariance function']); 
+        function this = Clamp(covfn, indx, value)
+           if ~isa(covfn,'tacopig.covfn.CovFunc')
+               error('tacopig:badConfiguration', [class(this),': must specify a valid covariance function']); 
            end
-           
            this.indx = indx;
            this.value = value;
            this.covfn = covfn;

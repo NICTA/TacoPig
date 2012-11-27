@@ -21,7 +21,7 @@ xstar = linspace(-8, 8, 201);
 y = y(id);
 
 % Use a standard GP regression model:
-GP = tacopig.gp.Regression;
+GP = tacopig.gp.Regressor;
 
 % Plug in the data
 GP.X = X;
@@ -29,13 +29,17 @@ GP.y = y;
 
 % Plug in the components
 GP.MeanFn  = tacopig.meanfn.ConstantMean(mean(y));
-GP.CovFn   = tacopig.covfn.SqExp();
+
+GP.CovFn   = tacopig.covfn.Product(tacopig.covfn.NegExp(),tacopig.covfn.SqExp());%SqExp();
+
+%GP.CovFn   = tacopig.covfn.Product(tacopig.covfn.NegExp(),tacopig.covfn.SqExp());%SqExp();
+%tacopig.covfn.Clamp(tacopig.covfn.NegExp(),2,4);%SqExp();
 GP.NoiseFn = tacopig.noisefn.Stationary();
 
 % Optional Configuration
 % GP.factorisation      = 'SVD';
 % GP.solver_function    = @fminunc;
-% GP.objective_function = @tacopig.objectivefn.NLML;
+ %GP.objective_function = @tacopig.objectivefn.CrossVal; %NLML
 % GP.optimset('gradobj', 'off');
 
 % Initialise the hyperparameters
@@ -67,7 +71,6 @@ GP.learn();
 GP.solve();
 [mf, vf] = GP.query(xstar);
 sf  = sqrt(vf);
-
 
 % Display learnt model
 figure

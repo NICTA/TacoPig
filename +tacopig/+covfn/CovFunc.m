@@ -33,7 +33,7 @@ classdef CovFunc < handle
         
         % Gradient of K(X,X) (stub)
         function gradient(this)
-            error([class(this),' does not implement gradients!']);
+            error('tacopig:badConfiguration',[class(this),' does not implement gradients!']);
         end
         
     end

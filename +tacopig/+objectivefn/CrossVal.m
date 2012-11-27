@@ -1,4 +1,4 @@
- function [crossvalerr crossvalerr_grad] = GP_CRSVAL_FN(this, parvec)
+ function [crossvalerr crossvalerr_grad] = CrossVal(this, parvec)
             
             % Get configuration
             use_svd = strcmpi(this.factorisation, 'svd');
@@ -16,7 +16,7 @@
 
             % save so we can stop and continue optimisation
             this.meanpar = meanpar;
-            this.covpar = meanpar;
+            this.covpar = covpar;
             this.noisepar = noisepar;
 %             this.tmphypers = tmph;
             
@@ -66,7 +66,7 @@
                     L = chol(K, 'lower');
                     alpha = L'\(L\ym');
                 else
-                    error('Invalid factorisation choice');
+                    error('tacopig:inputOutOfRange','Invalid factorisation choice');
                 end
 
                 %Calc predictive mean
@@ -93,14 +93,15 @@
             %Numerically Compute the gradient for covariance hyperparameters
             if nargout>1
                 
-                 val0 = GP_CRSVAL_FN (this, parvec);
+                 %val0 = tacopig.objectivefn.CrossVal(this, parvec);
+                 val0 = crossvalerr;
                  eps = 1e-9;
                  crossvalerr_grad = zeros(size(parvec))';
                  
                 for i = 1:length(parvec)
                    params2 = parvec;
                    params2(i) = params2(i) + eps;
-                   val1 = GP_CRSVAL_FN (this, params2);
+                   val1 = tacopig.objectivefn.CrossVal(this, params2);
                    crossvalerr_grad(i) = (val1-val0)/eps;
                 end
             end

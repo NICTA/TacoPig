@@ -1,18 +1,20 @@
-% Set up a generic covprod type approach
-classdef GP_CovProd < GP_CovFunc
+% tacopig.covfn.Product(child1, child2, ...)
+% Defines a covariance function product of the children.
+% All children must inherit tacopig.covfn.CovFn
+
+classdef Product < tacopig.covfn.CovFunc
     
     properties
        children
     end
     
     methods
-        
-        function this = GP_CovProd(varargin)
+        function this = Product(varargin)
            n_children = length(varargin);
 
            for i=1:n_children
-               if ~isa(varargin{i},'GP_CovFunc')
-                  error('Argument ', num2str(i), ' is not a valid covariance function'); 
+               if ~isa(varargin{i}, 'tacopig.covfn.CovFunc')
+                  error('tacopig:badConfiguration',[ 'Argument ', num2str(i), ' is not a valid covariance function']); 
                end
            end
            this.children = varargin;
@@ -29,7 +31,7 @@ classdef GP_CovProd < GP_CovFunc
         function K = eval(this, X1, X2, par)
             D = size(X1,1); %number of points in X1
             if D~=size(X2,1)
-                error('Dimensionality of X1 and X2 must be the same');
+                error('tacopig:dimMismatch', 'Dimensionality of X1 and X2 must be the same');
             end
             npar = length(par);
             n_children = length(this.children);
@@ -39,7 +41,7 @@ classdef GP_CovProd < GP_CovFunc
             for i=1:n_children
                 right = right + this.children{i}.npar(D);
                 if (npar<right)
-                    error('Need more hyperparameters for CovProd');
+                    error('tacopig:inputInvalidLength', 'Need more hyperparameters for product.');
                 end
                 K = K .* this.children{i}.eval(X1, X2, par(left+1:right));
                 left = right;
@@ -58,7 +60,7 @@ classdef GP_CovProd < GP_CovFunc
             for i=1:n_children
                 right = right + this.children{i}.npar(D);
                 if (npar<right)
-                    error('Need more hyperparameters for CovSum');
+                    error('tacopig:inputInvalidLength', 'Need more hyperparameters for product.');
                 end
                 K = K .* this.children{i}.Keval(X, par(left+1:right));
                 left = right;
@@ -77,7 +79,7 @@ classdef GP_CovProd < GP_CovFunc
             for i=1:n_children
                 right = right + this.children{i}.npar(D);
                 if (npar<right)
-                    error('Need more hyperparameters for CovProd');
+                    error('tacopig:inputInvalidLength', 'Need more hyperparameters for product.');
                 end
                 glist{i} = this.children{i}.gradient(X, par(left+1:right) );
                 klist{i} = this.children{i}.Keval(X, par(left+1:right) );
@@ -113,7 +115,7 @@ classdef GP_CovProd < GP_CovFunc
             for i=1:n_children
                 right = right + this.children{i}.npar(D);
                 if (npar<right)
-                    error('Need more hyperparameters for CovSum');
+                    error('tacopig:inputInvalidLength', 'Need more hyperparameters for product');
                 end
                 v = v .* this.children{i}.pointval(x_star, par(left+1:right));
                 left = right;
