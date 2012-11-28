@@ -7,3 +7,9 @@ With contributions from:
 
 Fabio Ramos
 Lachlan McCalman
+
+
+We also use the following external packages:
+matlab-xunit-doctest
+minFunc
+minimize

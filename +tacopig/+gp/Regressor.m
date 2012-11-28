@@ -25,23 +25,17 @@ classdef Regressor < tacopig.gp.GpCore
         
         % Constructor
         function this = Regressor()
-             this.opts =  optimset('LargeScale','off','MaxIter',1000,'Diagnostics', 'on',...
-                 'GradObj', 'on', 'Display', 'iter','TolFun',  1e-10, 'MaxFunEvals', 5000);
-             this.factorisation = 'CHOL';
+             
+             this.factorisation = 'chol';
              this.objective_function = @tacopig.objectivefn.NLML;
-             this.solver_function = @fminunc;
+             this.solver_function = @(fn, x0, opts) minFunc(fn, x0', opts); 
              this.has_been_solved = 0;
+             
+             this.opts = [];
+             this.opts.Method = 'lbfgs';
+             this.opts.numDiff = 0;
         end
-        
-        % Provide convenient access to optimisation settings
-        function optimset(varargin)
-            this = varargin{1};
-            this.opts = optimset(this.opts, varargin{2:end});
-        end
-        function out = optimget(varargin)
-            this = varargin{1};
-            out = optimget(this.opts, varargin{2:end});
-        end
+                
         
         % Run the GP Inference
         function solve(this)
@@ -196,9 +190,33 @@ classdef Regressor < tacopig.gp.GpCore
             % Pack hyperparameters into a single vector
             par0 = [this.meanpar, this.covpar, this.noisepar];
             
-            % It is assumed the objective function is equivalent to fminunc
-            % Otherwise errors will be thrown
-            [par,fval] = this.solver_function(@(theta) this.objectfun(theta), par0, this.opts);
+            
+            % Heuristic checks
+%              fname = func2str(this.solver_function);
+%              len = min(6, numel(fname));
+%              fname = fname(end-len:end)
+%              if (strcmpi(fname, 'fminunc'))
+%                  if ~isfield(this.opts,'LargeScale')
+%                      warning('It looks like you are using fminunc with minfunc options.');
+%                      %this.opts =  optimset('LargeScale','off','MaxIter',1000,'Diagnostics', 'on',...
+%                      %   'GradObj', 'on', 'Display', 'iter','TolFun',  1e-10, 'MaxFunEvals', 5000);
+%                  end
+%              end
+%              if (strcmpi(fname, 'inimize')) % minimize
+%                  if isstruct(this.opts)
+%                      warning('It looks like you are using minimize with struct options.');
+%                      %this.opts =  optimset('LargeScale','off','MaxIter',1000,'Diagnostics', 'on',...
+%                      %   'GradObj', 'on', 'Display', 'iter','TolFun',  1e-10, 'MaxFunEvals', 5000);
+%                  end
+%              end
+             [par,fval] = this.solver_function(@(theta) this.objectfun(theta), par0, this.opts);
+             
+             % some of the optimizers transpose par...
+             if ((size(par,1) > 1)&(size(par,2) ==1))
+                % the optimizer transposed the parameters...
+                par = par';
+             end 
+             
              
             % Unpack the parameters again to save them:   
             D = size(this.X,1);
