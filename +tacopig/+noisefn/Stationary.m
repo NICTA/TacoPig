@@ -8,21 +8,13 @@ classdef Stationary < tacopig.noisefn.NoiseFunc
         end
         
         function noise = eval(in1, par)
-            if isa(in1, 'GP_STD')
-                X = in1.X;
-            else
-                X = in1;
-            end
+            X = in1.X;
             [D,N] = size(X); %N number of points in X
             noise = par^2*eye(N);
         end
         
         function [g] = gradient(in1, par)
-            if isa(in1, 'GP_STD')
-                X = in1.X;
-            else
-                X = in1;
-            end
+            X = in1.X;
             [D,N] = size(X); %N number of points in X
             g = {2*par*eye(N)};
         end

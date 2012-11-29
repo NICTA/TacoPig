@@ -3,6 +3,10 @@
 %  Demonstrates GP regression using the taco-pig toolbox.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%Add optimization folder
+% p = pwd(); slash = p(1);
+% addpath(genpath(['..',slash,'optimization']))
+addpath(genpath(['optimization']))
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 close all; clear all; clear functions; clc;
@@ -165,9 +169,10 @@ for i = 1:5
     fstar = GP.sampleprior(xstar);
     surf(xeva,yeva,reshape(fstar,size(xeva)));
     title('Samples from Prior')
-    pause(1)
+    pause(2)
 end
 
+pause
 
 figure
 hold on;
@@ -176,7 +181,7 @@ for i = 1:5
     fstar = GP.sampleposterior(xstar);
     surf(xeva,yeva,reshape(fstar,size(xeva)));
     title('Samples from Posterior')
-    pause(1)
+    pause(2)
 end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 3-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -195,7 +200,7 @@ xstar = [xeva(:)';yeva(:)';zeva(:)'];
 
 figure; scatter3(X(1,:),X(2,:),X(3,:),40,y,'filled')
 
-
+pause
 %% Set up Gaussian process
 
 % Use a standard GP regression model:

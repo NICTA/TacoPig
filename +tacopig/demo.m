@@ -4,6 +4,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 close all; clear all; clear functions; clc;
+p = pwd(); slash = p(1);
+addpath(genpath(['..',slash,'optimization']))
 % import tacopig.*;
 
 % Training Data
@@ -30,29 +32,31 @@ GP.y = y;
 % Plug in the components
 GP.MeanFn  = tacopig.meanfn.ConstantMean(mean(y));
 
-GP.CovFn   = tacopig.covfn.Product(tacopig.covfn.NegExp(),tacopig.covfn.SqExp());%SqExp();
-
-%GP.CovFn   = tacopig.covfn.Product(tacopig.covfn.NegExp(),tacopig.covfn.SqExp());%SqExp();
+%GP.CovFn   = tacopig.covfn.Product(tacopig.covfn.Neg),tacopig.covfn.SqExp());%SqExp();
+%tacopig.covfn.Product(tacopig.covfn.NegExp(),tacopig.covfn.SqExp());%SqExp();
+GP.CovFn   = tacopig.covfn.SqExp();%Mat3();% SqExp();
 %tacopig.covfn.Clamp(tacopig.covfn.NegExp(),2,4);%SqExp();
+
 GP.NoiseFn = tacopig.noisefn.Stationary();
 
 % Optional Configuration
-% GP.factorisation      = 'SVD';
-% GP.solver_function    = @fminunc;
- %GP.objective_function = @tacopig.objectivefn.CrossVal; %NLML
+GP.factorisation      = 'SVD';
+%GP.solver_function    = @anneal;
+
+GP.objective_function = @tacopig.objectivefn.NLML; %CrossVal; % 
+% GP.opts.numDiff = 1; % use numerical gradients?
 % GP.optimset('gradobj', 'off');
 
 % Initialise the hyperparameters
-GP.covpar   = 0.5*ones(1,GP.CovFn.npar(size(X,1)));
+GP.covpar   = .5*ones(1,GP.CovFn.npar(size(X,1)));
 GP.meanpar  = zeros(1,GP.MeanFn.npar(size(X,1)));
-GP.noisepar = 1e-3*ones(1,GP.NoiseFn.npar);
+GP.noisepar = 1e-1*ones(1,GP.NoiseFn.npar);
 
 
 %% Prior to Learning: Query
 GP.solve(); 
 [mf, vf] = GP.query(xstar);
 sf  = sqrt(vf);
-
 
 figure
 plot(X, y, 'k+', 'MarkerSize', 17)
@@ -63,6 +67,8 @@ h(2) = plot(xstar,mf,'k-','LineWidth',2);
 h(3) = plot(X, y, 'k+', 'MarkerSize', 17);
 title('Not learnt');
 legend(h,'Predictive Standard Deviation','Predictive Mean', 'Training Points')
+
+%return
 
 %% Learn & Query
 disp('Press any key to begin learning.')
