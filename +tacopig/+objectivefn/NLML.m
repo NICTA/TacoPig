@@ -1,12 +1,12 @@
 function [nlml, nlmlg] = NLML(this, parvec)
             
-            % Special case: Multi-task
-            if isa(this,'GP_MultiTask')
-                 error('Please use GP_MT_LMLG_FN');
-            end
-            if isa(this,'GP_SR')
-                error('Please use GP_SR_LMLG');
-            end
+%             % Special case: Multi-task
+%             if isa(this,'GP_MultiTask')
+%                  error('Please use GP_MT_LMLG_FN');
+%             end
+%             if isa(this,'GP_SR')
+%                 error('Please use GP_SR_LMLG');
+%             end
                 
                 
             % Get configuration

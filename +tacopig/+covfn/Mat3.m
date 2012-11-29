@@ -1,4 +1,4 @@
-classdef GP_Mat3Cov < GP_CovFunc
+classdef Mat3 < tacopig.covfn.CovFunc
    
     % Most covariance functions will be static
     methods(Static) 
@@ -31,7 +31,7 @@ classdef GP_Mat3Cov < GP_CovFunc
             
           %Gradient currently not working correctly.
             % Same as K?
-            [Kg z] = GP_Mat3Cov.eval(X, X, par);
+            [Kg z] = tacopig.covfn.Mat3.eval(X, X, par);
 
             [d,n] = size(X);
             g = cell(1,d+1);

@@ -1,6 +1,6 @@
 % Covariance function to add two or more underlying covariance functions.
 
-classdef GP_CovSum < GP_CovFunc
+classdef Sum < tacopig.covfn.CovFunc
     
     properties
        children
@@ -8,10 +8,10 @@ classdef GP_CovSum < GP_CovFunc
     
     methods
         
-        function this = GP_CovSum(varargin)
+        function this = Sum(varargin)
            n_children = length(varargin);
            for i=1:n_children
-               if ~isa(varargin{i},'GP_CovFunc')
+               if ~isa(varargin{i},'tacopig.covfn.CovFunc')
                   error('Argument ', num2str(i), ' is not a valid covariance function'); 
                end
            end
