@@ -52,6 +52,10 @@ classdef Mat3 < tacopig.covfn.CovFunc
         
         % Also overload the point covariance kx*x* - its trivial
         function v = pointval(x_star, par)
+             [D,N1] = size(x_star); %number of points in X1
+             if (length(par)~=D+1)
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
+             end
             v = par(end).^2 * ones(1,size(x_star,2));
         end
         

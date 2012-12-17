@@ -7,14 +7,12 @@ classdef Stationary < tacopig.noisefn.NoiseFunc
             n_theta = 1; % normal iid noise
         end
         
-        function noise = eval(in1, par)
-            X = in1.X;
+        function noise = eval(X, par)
             [D,N] = size(X); %N number of points in X
             noise = par^2*eye(N);
         end
         
-        function [g] = gradient(in1, par)
-            X = in1.X;
+        function [g] = gradient(X, par)
             [D,N] = size(X); %N number of points in X
             g = {2*par*eye(N)};
         end

@@ -1,6 +1,6 @@
 % Mean Function Abstract Class
 
-classdef MeanFunc < handle
+classdef MeanFunc < tacopig.taco
     
     methods(Abstract)
         

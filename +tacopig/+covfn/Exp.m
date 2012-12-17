@@ -9,11 +9,12 @@ classdef NegExp < tacopig.covfn.CovFunc
         function [K z] = eval(X1, X2, par)
             [D,N1] = size(X1); %number of points in X1
             N2 = size(X2,2); %number of points in X2
-            if D~=size(X2,1)
-                error('Dimensionality of X1 and X2 must be the same');
+            if (D~=size(X2,1))
+                error('tacopig:dimMismatch','Dimensionality of X1 and X2 must be the same.');
             end
+            
             if (length(par)~=D+1)
-                error('Wrong number of hyperparameters for SqExp');
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters for NegExp');
             end
             %Compute weighted squared distances:
             w = par(1:D)'.^(-2);
@@ -51,6 +52,10 @@ classdef NegExp < tacopig.covfn.CovFunc
         
         % Also overload the point covariance kx*x* - its trivial
         function v = pointval(x_star, par)
+            [D,N1] = size(x_star); %number of points in X1
+            if (length(par)~=D+1)
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
+            end
             v = par(end).^2 * ones(1,size(x_star,2));
         end
         

@@ -1,6 +1,6 @@
 % Covariance Function Abstract Class
 
-classdef CovFunc < handle
+classdef CovFunc < tacopig.taco
     
     methods (Abstract)
         % Automatically report hyperparameter dimensionality
@@ -14,7 +14,8 @@ classdef CovFunc < handle
     end
 
     methods
-        % Additional Special Cases:        
+
+        % just run with the default constructor
         
         % Efficient case for getting Kx*x* (just points)
         function v = pointval(this, x_star, theta)

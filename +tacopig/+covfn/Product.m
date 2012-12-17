@@ -4,6 +4,10 @@
 
 classdef Product < tacopig.covfn.CovFunc
     
+    properties(Constant)
+        teststring = 'Product(tacopig.covfn.SqExp(), tacopig.covfn.Mat3())'
+    end
+    
     properties
        children
     end
@@ -33,6 +37,11 @@ classdef Product < tacopig.covfn.CovFunc
             if D~=size(X2,1)
                 error('tacopig:dimMismatch', 'Dimensionality of X1 and X2 must be the same');
             end
+            
+            if (size(par,2)~= this.npar(D))
+                error('tacopig:inputInvalidLength','Wrong Hyperparameter Length!');
+            end
+            
             npar = length(par);
             n_children = length(this.children);
             K = 1;

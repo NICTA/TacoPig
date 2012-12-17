@@ -2,6 +2,10 @@
 
 classdef Sum < tacopig.covfn.CovFunc
     
+    properties(Constant)
+        teststring = 'Sum(tacopig.covfn.Mat3(), tacopig.covfn.SqExp())';
+    end
+    
     properties
        children
     end
@@ -29,10 +33,20 @@ classdef Sum < tacopig.covfn.CovFunc
         function K = eval(this, X1, X2, par)
             D = size(X1,1); %number of points in X1
             if D~=size(X2,1)
-                error('Dimensionality of X1 and X2 must be the same');
+                 error('tacopig:dimMismatch','Dimensionality of X1 and X2 must be the same.');
             end
+            
+            
             npar = length(par);
             n_children = length(this.children);
+            
+            
+            if (npar~=this.npar(D))
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters for NegExp');
+            end
+            
+            
+            
             K = 0;
             left = 0;
             right = 0;
@@ -51,6 +65,10 @@ classdef Sum < tacopig.covfn.CovFunc
          function K = Keval(this, X, par)
             D = size(X,1); %number of points in X1
             npar = length(par);
+            if (npar~=this.npar(D))
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters for NegExp');
+            end
+            
             n_children = length(this.children);
             K = 0;
             left = 0;
@@ -90,6 +108,9 @@ classdef Sum < tacopig.covfn.CovFunc
         function v = pointval(this, x_star, par)
             [D,N] = size(x_star);
             npar = length(par);
+            if (npar~=this.npar(D))
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters for NegExp');
+            end
             v = 0;
             n_children = length(this.children);
             K = 0;

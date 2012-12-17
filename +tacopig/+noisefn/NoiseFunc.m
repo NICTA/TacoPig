@@ -1,19 +1,17 @@
 % Noise Function Abstract Class
 
-classdef NoiseFunc < handle
+classdef NoiseFunc < tacopig.taco
 
     methods (Abstract)
         % Automatically report number of parameters:
-        n_theta = npar(this); 
-        
+        n_theta = npar(this, D); 
         % Evaluate
-        noise = eval(this, X1, X2, theta);
+        noise = eval(this, X1, theta);
     end
     
     methods
-        
         % Gradient stub that may be overloaded
-        function gradient(this)
+        function gradient(this, varargin)
             error([class(this),' does not implement gradients!']);
         end
     end

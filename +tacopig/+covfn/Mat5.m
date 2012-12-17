@@ -1,4 +1,4 @@
-classdef GP_Mat5Cov < GP_CovFunc
+classdef Mat5 < tacopig.covfn.CovFunc
    
     % Most covariance functions will be static
     methods(Static) 
@@ -31,7 +31,7 @@ classdef GP_Mat5Cov < GP_CovFunc
             
           %Gradient currently not working correctly.
           
-            [Kg z] = GP_Mat5Cov.eval(X, X, par);
+            [Kg z] = tacopig.covfn.Mat5.eval(X, X, par);
 
             [d,n] = size(X);
             g = cell(1,d+1);
@@ -52,6 +52,10 @@ classdef GP_Mat5Cov < GP_CovFunc
         
         % Also overload the point covariance kx*x* - its trivial
         function v = pointval(x_star, par)
+            [D,N1] = size(x_star); %number of points in X1
+            if (length(par)~=D+1)
+               error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
+            end
             v = par(end).^2 * ones(1,size(x_star,2));
         end
         

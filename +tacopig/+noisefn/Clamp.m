@@ -1,5 +1,5 @@
 % Allows a clamp hyperparameters in the noise func
-classdef GP_ClampNoise < GP_NoiseFunc
+classdef Clamp < tacopig.noisefn.NoiseFunc
     
     properties
        indx
@@ -7,10 +7,14 @@ classdef GP_ClampNoise < GP_NoiseFunc
        noisefn
     end
     
+    properties(Constant)
+        teststring = 'Clamp(tacopig.noisefn.Stationary(), 1, 0)';
+    end
+    
     methods
         
-        function this = GP_ClampNoise(noisefn, indx, value)
-           if ~isa(noisefn,'GP_NoiseFunc')
+        function this = Clamp(noisefn, indx, value)
+           if ~isa(noisefn,'tacopig.noisefn.NoiseFunc')
                error([class(this),': must specify a valid noise function']); 
            end
            
@@ -19,27 +23,20 @@ classdef GP_ClampNoise < GP_NoiseFunc
            this.noisefn = noisefn;
         end   
             
-        function n_theta = npar(this)
-            n_theta = this.noisefn.npar - length(this.indx);
+        function n_theta = npar(this,D)
+            n_theta = this.noisefn.npar(D) - length(this.indx);
         end
         
-        function noise = eval(this, GP, parin)
+        function noise = eval(this, X, parin)
             par = this.getpar(parin);
-            noise = this.noisefn.eval(GP,par);
+            noise = this.noisefn.eval(X,par);
         end
         
         
-        function g = gradient(this,GP, parin)
-            % Inefficiency at the cost of being clean
-            % The alternative is to have a gradient method that takes as an
-            % input a list of which gradients we need to know...
-            
+        function g = gradient(this,X, parin)
             [par, nindx] = this.getpar(parin);
-            g0 = this.noisefn.gradient(GP.X, par); % be careful to concatenate along the right dimension...
-            
-            
+            g0 = this.noisefn.gradient(X, par); % be careful to concatenate along the right dimension...
             g = g0(nindx);
-            
         end
         
  

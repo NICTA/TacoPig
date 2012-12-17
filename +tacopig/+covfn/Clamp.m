@@ -1,6 +1,10 @@
 % Allows a projection matrix like G to be applied around the kernel
 classdef Clamp < tacopig.covfn.CovFunc
     
+    properties(Constant)
+        teststring = 'Clamp(tacopig.covfn.SqExp(), 1, 2)';
+    end
+    
     properties
        indx
        value
@@ -23,11 +27,17 @@ classdef Clamp < tacopig.covfn.CovFunc
         end
         
         function K = eval(this, X1, X2, parin)
+            if (length(parin)~=this.npar(size(X1,1)))
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
+            end
             par = this.getpar(parin, size(X1,1));
             K = this.covfn.eval(X1,X2,par);
         end
         
         function K = Keval(this, X, parin)
+            if (length(parin)~=this.npar(size(X,1)))
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
+            end
             par = this.getpar(parin, size(X,1));
             K = this.covfn.Keval(X,par);
         end
@@ -45,6 +55,9 @@ classdef Clamp < tacopig.covfn.CovFunc
         
         % Overload the point covariance - its trivial to add them
         function v = pointval(this, x_star, parin)
+            if (length(parin)~=this.npar(size(x_star,1)))
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
+            end
             par = this.getpar(parin, size(x_star,1));
             v = this.covfn.pointval(x_star, par);
         end

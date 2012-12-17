@@ -3,7 +3,11 @@
 % Eg. [1 1 2] would map optimisation vector [a b] into hyper vector [a a b]
 
 classdef Remap < tacopig.covfn.CovFunc
-    
+
+    properties(Constant)
+        % test dimensions = 3
+        teststring = 'Remap(tacopig.covfn.SqExp(), [1 1 2 3])';
+    end
     properties
        indx
        covfn
@@ -33,11 +37,19 @@ classdef Remap < tacopig.covfn.CovFunc
         end
         
         function K = eval(this, X1, X2, parin)
+            [D,N1] = size(X1); %number of points in X1
+             if (length(parin)~=this.npar(D))
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
+            end
             par = parin(this.indx);
             K = this.covfn.eval(X1,X2,par);
         end
         
         function K = Keval(this, X, parin)
+            [D,N1] = size(X); %number of points in X1
+             if (length(parin)~=this.npar(D))
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
+            end
             par = parin(this.indx);
             K = this.covfn.Keval(X,par);
         end
@@ -66,6 +78,10 @@ classdef Remap < tacopig.covfn.CovFunc
         
         % Overload the point covariance - its trivial to add them
         function v = pointval(this, x_star, parin)
+             [D,N1] = size(x_star); %number of points in X1
+             if (length(parin)~=this.npar(D))
+                error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
+            end
             par = parin(this.indx);
             v = this.covfn.pointval(x_star, par);
         end

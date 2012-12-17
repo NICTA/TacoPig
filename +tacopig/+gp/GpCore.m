@@ -1,7 +1,7 @@
 % Gaussian Process Core Model
 % Abstract class to define basic GP interface.
 
-classdef GpCore < handle
+classdef GpCore < tacopig.taco
     
     % Members common to all GP models
     properties

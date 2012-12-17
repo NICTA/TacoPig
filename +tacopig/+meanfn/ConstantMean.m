@@ -7,6 +7,11 @@ classdef ConstantMean < tacopig.meanfn.MeanFunc
         value;
     end
 
+    properties (Constant)
+        teststring = 'ConstantMean(0)';
+    end
+    
+    
     methods(Static)
         function n = npar(~) 
             n = 0; 
@@ -23,7 +28,11 @@ classdef ConstantMean < tacopig.meanfn.MeanFunc
         end    
 
         % X is usually passed in, but we ignore it with ~
-        function mu = eval(this, X,~) 
+        function mu = eval(this, X,par) 
+            if (numel(par)~=0)
+                error('tacopig:inputInvalidLength','ConstantMean has no hyperparameters!')
+            end
+            
             val = this.value;
             if (numel(val) ==1)
                 mu = this.value*ones(1,size(X,2));

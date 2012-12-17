@@ -18,12 +18,13 @@ classdef Regressor < tacopig.gp.GpCore
         factors             % Factors produced by the factorisation
         has_been_solved     % Flag to stop premature querying of a model
         lml                 % log marginal likelihood of training data
+        verbose             % Should friendly warnings & progress be displayed?
     end
     
    
     methods
         
-        % Constructor
+        % Constructor - default settings
         function this = Regressor()
              
              this.factorisation = 'chol';
@@ -34,6 +35,8 @@ classdef Regressor < tacopig.gp.GpCore
              this.opts = [];
              this.opts.Method = 'lbfgs';
              this.opts.numDiff = 0;
+             
+             this.verbose = true;
         end
                 
         
@@ -102,6 +105,7 @@ classdef Regressor < tacopig.gp.GpCore
                 error('tacopig:inputInvalidType', 'Batches must be an integer');
             end
             batches = round(batches);
+            
             % The user can also (optionally get the full variance 
             if (nargout==3)
                 % provided they havent split the data
@@ -109,8 +113,8 @@ classdef Regressor < tacopig.gp.GpCore
                     error('tacopig:badConfiguration', 'Cannot obtain full variance in batches');
                 end
                 
-                if (nx>10000)
-                    disp(['Warning: Large number of query points.'...
+                if (nx>4000)&(this.verbose)
+                    disp(['Warning: Large number of query points for obtaining full posterior covariance!'...
                         'This may result in considerable computational time.'...
                         'Press Ctrl+C to abort or any other key to continue.'])
                     pause
@@ -142,17 +146,18 @@ classdef Regressor < tacopig.gp.GpCore
             partitions = round(linspace(1, nx+1, batches+1));
             
             for i = 1:batches
-                % Handle batches
+                
+                % Handle Batches
                 L = partitions(i);
                 R = partitions(i+1)-1;
                 LR = L:R;
                 
                 % Progress Bar
-                if (batches>1)
+                if (batches>1)&&this.verbose
                     fprintf('%d to %d...\n',L, R);
                 end
                 
-                % Compute predictive mean
+                % Compute Predictive Mean
                 ks = this.CovFn.eval(this.X,x_star(:,LR),this.covpar)';
                 mu_star(LR) = mu_0(LR) + (ks*this.alpha)';
 
@@ -189,27 +194,8 @@ classdef Regressor < tacopig.gp.GpCore
 
             % Pack hyperparameters into a single vector
             par0 = [this.meanpar, this.covpar, this.noisepar];
-            
-            
-            % Heuristic checks
-%              fname = func2str(this.solver_function);
-%              len = min(6, numel(fname));
-%              fname = fname(end-len:end)
-%              if (strcmpi(fname, 'fminunc'))
-%                  if ~isfield(this.opts,'LargeScale')
-%                      warning('It looks like you are using fminunc with minfunc options.');
-%                      %this.opts =  optimset('LargeScale','off','MaxIter',1000,'Diagnostics', 'on',...
-%                      %   'GradObj', 'on', 'Display', 'iter','TolFun',  1e-10, 'MaxFunEvals', 5000);
-%                  end
-%              end
-%              if (strcmpi(fname, 'inimize')) % minimize
-%                  if isstruct(this.opts)
-%                      warning('It looks like you are using minimize with struct options.');
-%                      %this.opts =  optimset('LargeScale','off','MaxIter',1000,'Diagnostics', 'on',...
-%                      %   'GradObj', 'on', 'Display', 'iter','TolFun',  1e-10, 'MaxFunEvals', 5000);
-%                  end
-%              end
-             [par,fval] = this.solver_function(@(theta) this.objectfun(theta), par0, this.opts);
+
+            [par,fval] = this.solver_function(@(theta) this.objectfun(theta), par0, this.opts);
              
              % some of the optimizers transpose par...
              if ((size(par,1) > 1)&(size(par,2) ==1))
@@ -234,7 +220,7 @@ classdef Regressor < tacopig.gp.GpCore
         function [f_star] = sampleprior(this, x_star)
             this.check();
             nx = size(x_star,2);  
-            if (nx>10000)
+            if (nx>2000)&&this.verbose
                 disp(['Warning: Large number of query points.'...
                     'This may result in considerable computational time.'...
                     'Press Ctrl+C to abort or any other key to continue.'])
@@ -264,7 +250,7 @@ classdef Regressor < tacopig.gp.GpCore
             end
             [mu_star var_star var_full] = this.query(x_star);
             LFull  = chol(var_full+diag(var_star)*1e-4, 'lower');
-            f_star = 0.3*randn(1,nx)*LFull' +mu_star;
+            f_star = randn(1,nx)*LFull' +mu_star;
         end
         
         % Pass through objective function
