@@ -109,7 +109,7 @@ classdef Regressor < tacopig.gp.GpCore
                     error('tacopig:badConfiguration', 'Cannot obtain full variance in batches');
                 end
                 
-                if (nx>2000)
+                if (nx>10000)
                     disp(['Warning: Large number of query points.'...
                         'This may result in considerable computational time.'...
                         'Press Ctrl+C to abort or any other key to continue.'])
@@ -234,7 +234,7 @@ classdef Regressor < tacopig.gp.GpCore
         function [f_star] = sampleprior(this, x_star)
             this.check();
             nx = size(x_star,2);  
-            if (nx>2000)
+            if (nx>10000)
                 disp(['Warning: Large number of query points.'...
                     'This may result in considerable computational time.'...
                     'Press Ctrl+C to abort or any other key to continue.'])
@@ -264,7 +264,7 @@ classdef Regressor < tacopig.gp.GpCore
             end
             [mu_star var_star var_full] = this.query(x_star);
             LFull  = chol(var_full+diag(var_star)*1e-4, 'lower');
-            f_star = randn(1,nx)*LFull' +mu_star;
+            f_star = 0.3*randn(1,nx)*LFull' +mu_star;
         end
         
         % Pass through objective function

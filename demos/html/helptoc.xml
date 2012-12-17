@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding="utf-8"?>
+<toc version="2.0">
+
+    <tocitem target="Landing_Page.htm">TacoPig
+	<tocitem target="demo1D.html" 
+                 image="HelpIcon.EXAMPLES">Help
+        </tocitem>
+        <tocitem target="demo1D.html" 
+                 image="HelpIcon.EXAMPLES">demo1D
+        </tocitem>
+        <tocitem target="demo2D.html" 
+                 image="HelpIcon.EXAMPLES">demo2D
+        </tocitem>
+        <tocitem target="demo3D.html" 
+                 image="HelpIcon.EXAMPLES">demo3D
+        </tocitem>
+    </tocitem>
+
+</toc>

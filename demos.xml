@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<demos>
+    <name>TacoPig</name>
+    <type>toolbox</type>
+    <icon>HelpIcon.DEMOS</icon>
+    <description>Examples of TacoPig fitting Gaussian processes to various datasets</description>
+    <website><a href="http://www.tacopig.org">TacoPig Homepage</a></website>
+
+    <demosection>
+        <label>Different Dimensionalities</label>
+        <demoitem>
+            <label>1 dimensional dataset</label>
+            <type>M-file</type>
+            <source>demos/demo1D</source>
+        </demoitem>
+	<demoitem>
+            <label>2 dimensional dataset</label>
+            <type>M-file</type>
+            <source>demos/demo2D</source>
+        </demoitem>
+	<demoitem>
+            <label>3 dimensional dataset</label>
+            <type>M-file</type>
+            <source>demos/demo3D</source>
+        </demoitem>
+    </demosection>
+
+    <demosection>
+        <label> Non-stationary datasets</label>
+        <demoitem>
+            <label>Step Change</label>
+            <type>M-file</type>
+            <source>demos/demo3D</source>
+        </demoitem>
+    </demosection>
+
+</demos>
