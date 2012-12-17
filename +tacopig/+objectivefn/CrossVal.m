@@ -1,5 +1,9 @@
- function [crossvalerr crossvalerr_grad] = CrossVal(this, parvec)
+ function [crossvalerr crossvalerr_grad] = CrossVal(this, parvec, NumFolds)
             
+            if (nargin<3)
+                NumFolds = 5;
+            end
+ 
             % Get configuration
             use_svd = strcmpi(this.factorisation, 'svd');
             use_chol = strcmpi(this.factorisation, 'chol');
@@ -24,7 +28,7 @@
             y0 = this.y;
             
             %Partition the data into folds
-            NumFolds= 5; %Number of folds
+            
             rand('seed',100); %Ensures same folds used all the time
             
             % Indices = crossvalind('Kfold', N, NumFolds)'; %Assigns data to folds
@@ -96,7 +100,7 @@
                  %val0 = tacopig.objectivefn.CrossVal(this, parvec);
                  val0 = crossvalerr;
                  eps = 1e-9;
-                 crossvalerr_grad = zeros(size(parvec))';
+                 crossvalerr_grad = zeros(length(parvec),1);
                  
                 for i = 1:length(parvec)
                    params2 = parvec;
