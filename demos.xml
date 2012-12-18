@@ -5,23 +5,26 @@
     <icon>HelpIcon.DEMOS</icon>
     <description>Examples of TacoPig fitting Gaussian processes to various datasets</description>
     <website><a href="http://www.tacopig.org">TacoPig Homepage</a></website>
+    <help_location>+tacopig/+demos/html</help_location>
+    <help_contents_icon>$toolbox/matlab/icons/bookicon.gif</help_contents_icon>
+
 
     <demosection>
         <label>Different Dimensionalities</label>
         <demoitem>
             <label>1 dimensional dataset</label>
             <type>M-file</type>
-            <source>demos/demo1D</source>
+            <source>../+tacopig/+demos/html/demo1D</source>
         </demoitem>
 	<demoitem>
             <label>2 dimensional dataset</label>
             <type>M-file</type>
-            <source>demos/demo2D</source>
+            <source>+tacopig/+demos/html/demo2D</source>
         </demoitem>
 	<demoitem>
             <label>3 dimensional dataset</label>
             <type>M-file</type>
-            <source>demos/demo3D</source>
+            <source>../+tacopig/+demos/html/demo3D</source>
         </demoitem>
     </demosection>
 
@@ -30,7 +33,7 @@
         <demoitem>
             <label>Step Change</label>
             <type>M-file</type>
-            <source>demos/demo3D</source>
+            <source>../+tacopig/+demos/html/demo3D</source>
         </demoitem>
     </demosection>
 

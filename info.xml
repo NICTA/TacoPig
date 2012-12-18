@@ -6,15 +6,12 @@
     <matlabrelease>2012a</matlabrelease>
     <name>TacoPig</name>
     <type>toolbox</type>
-    <icon>/demos/html/tinypig.png</icon>
-    <help_location>demos/html</help_location>
+    <icon>+tacopig/+demos/html/tinypig.png</icon>
+    <help_location>+tacopig/+demos/html</help_location>
     <help_contents_icon>$toolbox/matlab/icons/bookicon.gif</help_contents_icon>
+     <website><a href="http://www.tacopig.org">TacoPig Homepage</a></website>
 
 <list>
-
-
-
-
 
 <listitem>
 <label>Help</label>
