@@ -1,11 +1,4 @@
-% A standard test on all existing covariance functions
-
-% Detects all covariance function classes and tests the following:
-%   *  parse the code with matlab
-%   *  instanciate the class with either no arguments or using the code 
-%      in the constant string member .teststring
-%   *  Check that the npar method returns a value - uses this to make a
-%      random test problem with a fixed seed reset so its repeatable
+% The standard template for testing the covariance functions
 
 %   *  Check for a 'tacopig:dimMismatch' when X1 and X2 have different 
 %      dimensionality in eval(X1,X2,par)
@@ -25,7 +18,6 @@
 %   *  If gradients are functioning:
 %         - numerically check gradients at 10 random operating points
 
-
 clear all
 clear functions
 clc
@@ -33,7 +25,7 @@ clc
 
   % Find all the covariance functions
   slash = pwd; slash = slash(1);
-  cov_functions = ['+tacopig', slash, '+covfn',slash,'*.m'];
+  cov_functions = ['../../+tacopig', slash, '+covfn',slash,'*.m'];
   filez = dir(cov_functions);
   ncovs = length(filez)-1;
   cov_names = cell(1, ncovs);

@@ -21,26 +21,36 @@ classdef TestSqExpCovFn < TestCase
     end
 
     function testNpar1(self)
-    %testNpar1 npar(1) = 2
-      assertEqual(tacopig.CovFn.SqExp.npar(1), 2);
+      %testNpar1 npar(1) = 2
+      %assertEqual(tacopig.covfn.SqExp.npar(1), 2);
+        testfoo
+        testbar
+      
+        function testfoo
+            assert(true);
+        end
+        
+        function testbar
+            assert(false);
+        end
     end
     function testNpar3(self)
     %testNpar3  npar(3) = 4
-      assertEqual(tacopig.CovFn.SqExp.npar(3), 4);
+      assertEqual(tacopig.covfn.SqExp.npar(3), 4);
     end
     function testNpar0(self)
     %testNpar0  npar(0) is out of range
-      f = @() tacopig.CovFn.SqExp.npar(0);
+      f = @() tacopig.covfn.SqExp.npar(0);
       assertExceptionThrown(f, 'tacopig:inputOutOfRange');
     end
     function testNparM1(self)
     %testNparM1 npar(-1) is out of range
-      f = @() tacopig.CovFn.SqExp.npar(-1);
+      f = @() tacopig.covfn.SqExp.npar(-1);
       assertExceptionThrown(f, 'tacopig:inputOutOfRange');
     end
     function testNpar1p5(self)
     %testNpar1p5 npar(1.5) float is invalid input 
-      f = @() tacopig.CovFn.SqExp.npar(1.5);
+      f = @() tacopig.covfn.SqExp.npar(1.5);
       assertExceptionThrown(f, 'tacopig:inputInvalidType');
     end
     
@@ -49,7 +59,7 @@ classdef TestSqExpCovFn < TestCase
       X1 =  1;
       X2 =  1;
       par = [1 2];
-      result = tacopig.CovFn.SqExp.eval(X1, X2, par);
+      result = tacopig.covfn.SqExp.eval(X1, X2, par);
       answer =  4;
       assertEqual(result, answer);
     end
