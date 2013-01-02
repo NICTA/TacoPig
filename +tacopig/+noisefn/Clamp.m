@@ -27,13 +27,15 @@ classdef Clamp < tacopig.noisefn.NoiseFunc
             n_theta = this.noisefn.npar(D) - length(this.indx);
         end
         
-        function noise = eval(this, X, parin)
+        function noise = eval(this, X, GP)
+            parin = this.getNoisePar(GP);
             par = this.getpar(parin);
             noise = this.noisefn.eval(X,par);
         end
         
         
-        function g = gradient(this,X, parin)
+        function g = gradient(this,X, GP)
+            parin = this.getNoisePar(GP);
             [par, nindx] = this.getpar(parin);
             g0 = this.noisefn.gradient(X, par); % be careful to concatenate along the right dimension...
             g = g0(nindx);

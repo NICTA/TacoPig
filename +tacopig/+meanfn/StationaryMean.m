@@ -9,7 +9,8 @@ classdef StationaryMean < tacopig.meanfn.MeanFunc
             n = 1; % intercept and gradients in each dimension
         end
         
-        function mu = eval(X, par) 
+        function mu = eval(X, GP) 
+            par = this.getMeanPar(GP);
             if (numel(par)~=1)
                 error('tacopig:inputInvalidLength','wrong number of hyperparameters!')
             end

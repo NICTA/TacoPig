@@ -1,12 +1,13 @@
-classdef NegExp < tacopig.covfn.CovFunc
+classdef Exp < tacopig.covfn.CovFunc
 
-    methods(Static) 
+    methods
         
-        function n_theta = npar(D)
+        function n_theta = npar(this, D)
             n_theta = D+1; % each dimension + signal variance
         end
         
-        function [K z] = eval(X1, X2, par)
+        function [K z] = eval(this, X1, X2, GP)
+            par = this.getCovPar(GP);
             [D,N1] = size(X1); %number of points in X1
             N2 = size(X2,2); %number of points in X2
             if (D~=size(X2,1))
@@ -27,11 +28,12 @@ classdef NegExp < tacopig.covfn.CovFunc
             K = par(D+1)^2 * exp(-sqrt(z)); 
         end
         
-        function [g] = gradient(X, par)
+        function [g] = gradient(this, X, GP)
+            par = this.getCovPar(GP);
             %Gradient currently not working correctly.
             epsilon = 1e-10; 
             % Same as K?
-            [Kg z] = tacopig.covfn.NegExp.eval(X, X, par);
+            [Kg z] = this.eval(X, X, par);
             z = z+epsilon*eye(size(z)); %jitter added to avoid divide by zero
             [d,n] = size(X);
             g = cell(1,d+1);
@@ -51,7 +53,8 @@ classdef NegExp < tacopig.covfn.CovFunc
         
         
         % Also overload the point covariance kx*x* - its trivial
-        function v = pointval(x_star, par)
+        function v = pointval(this, x_star, GP)
+            par = this.getCovPar(GP);
             [D,N1] = size(x_star); %number of points in X1
             if (length(par)~=D+1)
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');

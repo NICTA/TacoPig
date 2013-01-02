@@ -18,24 +18,36 @@ classdef CovFunc < tacopig.taco
         % just run with the default constructor
         
         % Efficient case for getting Kx*x* (just points)
-        function v = pointval(this, x_star, theta)
+        function v = pointval(this, x_star, GP)
             nstar = size(x_star,2);
             v = zeros(1,nstar);
             for i=1:nstar
                 xx = x_star(:,i);
-                v(i) = this.eval(xx,xx, theta);
+                v(i) = this.eval(xx,xx, GP); % using the case where it is a double
             end
         end
+   
         
         % Evaluation of K(X,X) (symmetric case)
-        function K = Keval(this, X, theta)
-            K = this.eval(X,X,theta);
+        function K = Keval(this, X, GP)
+            K = this.eval(X,X,GP);
         end
         
         % Gradient of K(X,X) (stub)
         function gradient(this)
             error('tacopig:badConfiguration',[class(this),' does not implement gradients!']);
         end
+        
+        function theta = getCovPar(this, GP)
+            if isa(GP, 'tacopig.gp.GpCore')
+                theta = GP.covpar;
+            elseif isa(GP, 'double')
+                theta = GP;
+            else
+                error('tacopig:badConfiguration', 'Error interpreting covpar.');
+            end
+        end
+        
         
     end
 end    

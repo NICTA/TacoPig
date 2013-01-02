@@ -26,7 +26,8 @@ classdef Clamp < tacopig.covfn.CovFunc
             n_theta = this.covfn.npar(D) - length(this.indx);
         end
         
-        function K = eval(this, X1, X2, parin)
+        function K = eval(this, X1, X2, GP)
+            parin = this.getCovPar(GP);
             if (length(parin)~=this.npar(size(X1,1)))
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
             end
@@ -34,7 +35,8 @@ classdef Clamp < tacopig.covfn.CovFunc
             K = this.covfn.eval(X1,X2,par);
         end
         
-        function K = Keval(this, X, parin)
+        function K = Keval(this, X, GP)
+            parin = this.getCovPar(GP);
             if (length(parin)~=this.npar(size(X,1)))
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
             end
@@ -42,7 +44,8 @@ classdef Clamp < tacopig.covfn.CovFunc
             K = this.covfn.Keval(X,par);
         end
         
-        function g = gradient(this,X, parin)
+        function g = gradient(this,X, GP)
+            parin = this.getCovPar(GP);
             % Inefficiency at the cost of being clean
             % The alternative is to have a gradient method that takes as an
             % input a list of which gradients we need to know...
@@ -54,7 +57,8 @@ classdef Clamp < tacopig.covfn.CovFunc
         end
         
         % Overload the point covariance - its trivial to add them
-        function v = pointval(this, x_star, parin)
+        function v = pointval(this, x_star, GP)
+            parin = this.getCovPar(GP);
             if (length(parin)~=this.npar(size(x_star,1)))
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
             end

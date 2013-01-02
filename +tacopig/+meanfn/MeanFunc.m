@@ -17,6 +17,20 @@ classdef MeanFunc < tacopig.taco
         function gradient(this) 
             error([class(this),' does not implement gradients!']);
         end
+        
+        function theta = getMeanPar(this, GP)
+            if isa(GP, 'tacopig.gp.GpCore')
+                theta = GP.meanpar;
+            elseif isa(GP, 'double')
+                theta = GP;
+            else
+                error('tacopig:badConfiguration', 'Error interpreting meanpar.');
+            end
+         end
+        
     end
+    
+    
+    
     
 end    

@@ -4,9 +4,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Add optimization folder
-% p = pwd(); slash = p(1);
-% addpath(genpath(['..',slash,'optimization']))
-addpath(genpath(['optimization']))
+
+if ~exist('minfunc')
+    warning('It looks like you need to add minfunc to your default path...\n');
+    fprintf('Press any key to attempt to continue...\n');
+    pause();
+end
+p = pwd(); slash = p(1);
+addpath(genpath(['..',slash,'optimization']))
+
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 close all; clear all; clear functions; clc;
@@ -97,6 +103,8 @@ h(2) = plot(xstar,mf,'k-','LineWidth',2);
 h(3) = plot(X, y, 'k+', 'MarkerSize', 17);
 title('After Hyperparameter Training');
 legend(h,'Predictive Standard Deviation','Predictive Mean', 'Training Points','Location','SouthWest')
+
+fprintf('Press any key to draw samples from these distributions...\n');
 pause
 
 %% Generate samples from prior and posterior

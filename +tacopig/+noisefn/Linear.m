@@ -7,11 +7,13 @@ classdef Linear < tacopig.noisefn.NoiseFunc
             n_theta = 1;
         end
         
-        function noise = eval(X, par)
+        function noise = eval(X, GP)
+             par = tacopig.noisefn.NoiseFunc.getNoisePar(GP);
              noise = diag(abs(X(1,:)*(par)^2));
         end
         
-        function [g] = gradient(X, par)
+        function [g] = gradient(X, GP)
+             par = tacopig.noisefn.NoiseFunc.getNoisePar(GP);
              g = {2*diag(abs(X(1,:)))*par};
         end
     end
