@@ -30,7 +30,8 @@ classdef Sum < tacopig.covfn.CovFunc
             end
         end
         
-        function K = eval(this, X1, X2, par)
+        function K = eval(this, X1, X2, GP)
+            par = this.getCovPar(GP);
             D = size(X1,1); %number of points in X1
             if D~=size(X2,1)
                  error('tacopig:dimMismatch','Dimensionality of X1 and X2 must be the same.');
@@ -62,7 +63,8 @@ classdef Sum < tacopig.covfn.CovFunc
         end
         
         
-         function K = Keval(this, X, par)
+         function K = Keval(this, X, GP)
+            par = this.getCovPar(GP);
             D = size(X,1); %number of points in X1
             npar = length(par);
             if (npar~=this.npar(D))
@@ -84,7 +86,8 @@ classdef Sum < tacopig.covfn.CovFunc
             
         end
         
-        function g = gradient(this,X, par)
+        function g = gradient(this,X, GP)
+            par = this.getCovPar(GP);
             [D,N] = size(X);
             npar = length(par);
             n_children = length(this.children);
@@ -105,7 +108,8 @@ classdef Sum < tacopig.covfn.CovFunc
         end
         
         % Overload the point covariance - its trivial to add them
-        function v = pointval(this, x_star, par)
+        function v = pointval(this, x_star, GP)
+            par = this.getCovPar(GP);
             [D,N] = size(x_star);
             npar = length(par);
             if (npar~=this.npar(D))

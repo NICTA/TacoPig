@@ -36,7 +36,8 @@ classdef Remap < tacopig.covfn.CovFunc
             n_theta = length(unique(indx));
         end
         
-        function K = eval(this, X1, X2, parin)
+        function K = eval(this, X1, X2, GP)
+            parin = this.getCovPar(GP);
             [D,N1] = size(X1); %number of points in X1
              if (length(parin)~=this.npar(D))
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
@@ -45,7 +46,8 @@ classdef Remap < tacopig.covfn.CovFunc
             K = this.covfn.eval(X1,X2,par);
         end
         
-        function K = Keval(this, X, parin)
+        function K = Keval(this, X, GP)
+            parin = this.getCovPar(GP);
             [D,N1] = size(X); %number of points in X1
              if (length(parin)~=this.npar(D))
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
@@ -54,8 +56,8 @@ classdef Remap < tacopig.covfn.CovFunc
             K = this.covfn.Keval(X,par);
         end
         
-        function g = gradient(this,X, parin)
-            
+        function g = gradient(this,X, GP)
+            parin = this.getCovPar(GP);
             % Have to be careful and add the gradients here            
             indx = this.indx;
             nindx = length(indx);
@@ -77,7 +79,8 @@ classdef Remap < tacopig.covfn.CovFunc
         end
         
         % Overload the point covariance - its trivial to add them
-        function v = pointval(this, x_star, parin)
+        function v = pointval(this, x_star, GP)
+             parin = this.getCovPar(GP);
              [D,N1] = size(x_star); %number of points in X1
              if (length(parin)~=this.npar(D))
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');

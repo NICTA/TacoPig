@@ -27,13 +27,13 @@ function [nlml, nlmlg] = NLML(this, parvec)
             % will we at some point have Keval providing gradients directly?
             %    [K, kgrad] = this.CovFn.Keval(this.X, covpar);
             %else
-                K = this.CovFn.Keval(this.X, covpar);
+                K = this.CovFn.Keval(this.X, this);
                 N = size(K,1); % not always equal to the size of X!
-                noise = this.NoiseFn.eval(this, noisepar);
+                noise = this.NoiseFn.eval(this.X, this);
             %end
             
             K = K + noise;
-            mu = this.MeanFn.eval(this.X, meanpar); 
+            mu = this.MeanFn.eval(this.X, this); 
             ym = this.y-mu;
             
             
@@ -64,10 +64,10 @@ function [nlml, nlmlg] = NLML(this, parvec)
             if nargout>1
                 
                 W = invK - alpha*alpha';
-                mgrad = this.MeanFn.gradient(this.X, meanpar);
-                kgrad = this.CovFn.gradient(this.X, covpar);
-                noisegrad = this.NoiseFn.gradient(this, noisepar);
-                nlmlg    = zeros(length(parvec),1);
+                mgrad     = this.MeanFn.gradient(this.X, this);
+                kgrad     = this.CovFn.gradient(this.X, this);
+                noisegrad = this.NoiseFn.gradient(this.X, this);
+                nlmlg     = zeros(length(parvec),1);
                 
                 % Mean Function Gradient
                 for i= 1:length(mgrad)

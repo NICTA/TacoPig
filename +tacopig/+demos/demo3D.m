@@ -12,6 +12,7 @@ addpath(genpath(['optimization']))
 close all; clear all; clear functions; clc;
 % import tacopig.*;
 
+
 %% Set up 3-D Data
 % Training Data
 groundtruth = @(x,y,z) 5*exp(-(((x).^2)/5+((1-y).^2)/2+((0.5-z).^2)/3))...
@@ -19,12 +20,12 @@ groundtruth = @(x,y,z) 5*exp(-(((x).^2)/5+((1-y).^2)/2+((0.5-z).^2)/3))...
 X = (rand(3,50)-0.5)*6;
 y = groundtruth(X(1,:),X(2,:),X(3,:))+1e-2*randn(1,size(X,2));
 
-[xeva yeva zeva] = meshgrid(-3:0.5:3,-3:0.5:3,-3:0.2:3);
+[xeva yeva zeva] = meshgrid(-3:0.5:3,-3:0.5:3,-3:0.5:3);
 xstar = [xeva(:)';yeva(:)';zeva(:)'];
 
 figure; scatter3(X(1,:),X(2,:),X(3,:),40,y,'filled')
 xlabel('x');ylabel('y');zlabel('z'); title('Training Data')
-
+fprintf('Press any key to continue...\n');
 pause
 %% Set up Gaussian process
 

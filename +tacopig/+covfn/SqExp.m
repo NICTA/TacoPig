@@ -1,9 +1,9 @@
 classdef SqExp < tacopig.covfn.CovFunc
    
     % Most covariance functions will be static
-    methods(Static) 
+    methods 
         
-        function n_theta = npar(D)
+        function n_theta = npar(this,D)
             if D <= 0
               error('tacopig:inputOutOfRange', 'Dimension cannot be < 1');
             end
@@ -13,7 +13,8 @@ classdef SqExp < tacopig.covfn.CovFunc
             n_theta = D+1; % each dimension + signal variance
         end
         
-        function K = eval(X1, X2, par)
+        function K = eval(this, X1, X2, GP)
+            par = this.getCovPar(GP);
             [D,N1] = size(X1); %number of points in X1
             N2 = size(X2,2); %number of points in X2
             if D~=size(X2,1)
@@ -33,10 +34,10 @@ classdef SqExp < tacopig.covfn.CovFunc
             K = par(D+1)^2 * exp(-0.5*z); 
         end
         
-        function [g] = gradient(X, par)
-            
+        function [g] = gradient(this,X, GP)
+            par = this.getCovPar(GP);
             % Same as K?
-            Kg = tacopig.covfn.SqExp.eval(X, X, par);
+            Kg = this.eval(X, X, par);
             
             [d,n] = size(X);
             g = cell(1,d+1);
@@ -55,7 +56,8 @@ classdef SqExp < tacopig.covfn.CovFunc
         
         
         % Also overload the point covariance kx*x* - its trivial
-        function v = pointval(x_star, par)
+        function v = pointval(this, x_star, GP)
+            par = this.getCovPar(GP);
             [D,N1] = size(x_star); %number of points in X1
             if (length(par)~=D+1)
                error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');

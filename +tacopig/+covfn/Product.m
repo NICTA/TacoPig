@@ -32,8 +32,9 @@ classdef Product < tacopig.covfn.CovFunc
             end
         end
         
-        function K = eval(this, X1, X2, par)
-            D = size(X1,1); %number of points in X1
+        function K = eval(this, X1, X2, GP)
+            par = this.getCovPar(GP);
+            D = size(X1,1); % number of points in X1
             if D~=size(X2,1)
                 error('tacopig:dimMismatch', 'Dimensionality of X1 and X2 must be the same');
             end
@@ -55,11 +56,15 @@ classdef Product < tacopig.covfn.CovFunc
                 K = K .* this.children{i}.eval(X1, X2, par(left+1:right));
                 left = right;
             end
+            if (right<npar)
+                error('tacopig:inputInvalidLength', 'Extra hyperparameters given to product?');
+            end
             
         end
         
         
-         function K = Keval(this, X, par)
+         function K = Keval(this, X, GP)
+            par = this.getCovPar(GP);
             D = size(X,1); %number of points in X1
             npar = length(par);
             n_children = length(this.children);
@@ -74,10 +79,14 @@ classdef Product < tacopig.covfn.CovFunc
                 K = K .* this.children{i}.Keval(X, par(left+1:right));
                 left = right;
             end
+            if (right<npar)
+                error('tacopig:inputInvalidLength', 'Extra hyperparameters given to product?');
+            end
             
         end
         
-        function g = gradient(this,X, par)
+        function g = gradient(this,X, GP)
+            par = this.getCovPar(GP);
             [D,N] = size(X);
             npar = length(par);
             n_children = length(this.children);
@@ -114,7 +123,8 @@ classdef Product < tacopig.covfn.CovFunc
         end
         
         % Overload the point covariance - its trivial to add them
-        function v = pointval(this, x_star, par)
+        function v = pointval(this, x_star, GP)
+            par = this.getCovPar(GP);
             [D,N] = size(x_star);
             npar = length(par);
             v = 1;
@@ -129,6 +139,10 @@ classdef Product < tacopig.covfn.CovFunc
                 v = v .* this.children{i}.pointval(x_star, par(left+1:right));
                 left = right;
             end
+            if (right<npar)
+                error('tacopig:inputInvalidLength', 'Extra hyperparameters given to product?');
+            end
+            
         end
         
     end

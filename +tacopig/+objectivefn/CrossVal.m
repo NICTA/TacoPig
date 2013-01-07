@@ -46,17 +46,15 @@
                 y_star = y0(:,Indices==i);
      
                 % Get mu, K and (y-mu) and gradients if needed
-                mu = this.MeanFn.eval(this.X, meanpar); 
-            
-                K = this.CovFn.Keval(this.X, covpar);
-                noise = this.NoiseFn.eval(this, noisepar);
+                mu = this.MeanFn.eval(this.X, this); 
+                K = this.CovFn.Keval(this.X, this);
+                noise = this.NoiseFn.eval(this.X, this);
 
                 K = K + noise;
-
                 ym = this.y-mu;
             
-                mu_0 = this.MeanFn.eval(x_star, meanpar);
-                ks = this.CovFn.eval(this.X,x_star,covpar)';
+                mu_0 = this.MeanFn.eval(x_star, this);
+                ks = this.CovFn.eval(this.X, x_star, this)';
             
                 % Factorise K
                 if (use_svd)
@@ -77,7 +75,7 @@
                 mu_star = mu_0 + (ks*alpha)';
                
                 %Calc predictive variance 
-                var0 = this.CovFn.pointval(x_star, covpar);
+                var0 = this.CovFn.pointval(x_star, this);
                 if use_svd
                     v = bsxfun(@times, sqrt(S2), (ks*U)');
                 elseif use_chol

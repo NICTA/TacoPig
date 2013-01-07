@@ -61,6 +61,7 @@ hold on
 surf(xeva,yeva,reshape(mf+sf,size(xeva)),'facealpha',0.1)
 surf(xeva,yeva,reshape(mf-sf,size(xeva)),'facealpha',0.1)
 xlabel('x');ylabel('y');zlabel('f(x,y)');title('Predictive Mean and Standard Deviation');
+fprintf('Press any key to continue...\n');
 pause
 
 %% Generate samples from prior and posterior
@@ -71,9 +72,9 @@ for i = 1:5
     fstar = GP.sampleprior(xstar);
     surf(xeva,yeva,reshape(fstar,size(xeva)));
     title('Sample from Prior')
-    pause(2)
+    pause(1)
 end
-
+fprintf('Press any key to continue...\n');
 pause
 
 figure
@@ -83,5 +84,5 @@ for i = 1:5
     fstar = GP.sampleposterior(xstar);
     surf(xeva,yeva,reshape(fstar,size(xeva)));
     title('Sample from Posterior')
-    pause(2)
+    pause(1)
 end

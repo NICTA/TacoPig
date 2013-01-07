@@ -1,6 +1,6 @@
 % Wraps a covariance function as a noise function
 % A covariance function isn't accepted by default - you have to explicitly
-% request it.
+% request it. We can't wrap all covariance functions
 classdef CovNoise < tacopig.noisefn.NoiseFunc
     
     properties(GetAccess = 'public', SetAccess = 'private')
@@ -24,11 +24,13 @@ classdef CovNoise < tacopig.noisefn.NoiseFunc
             n_theta = this.noisefn.npar(D);
         end
         
-        function noise = eval(this, X, parin)
+        function noise = eval(this, X, GP)
+            parin = this.getNoisePar(GP);
             noise = this.noisefn.Keval(X,parin);
         end
                 
-        function g = gradient(this,X, parin)
+        function g = gradient(this,X, GP)
+            parin = this.getNoisePar(GP);
             g = this.noisefn.gradient(X, parin);
         end
         

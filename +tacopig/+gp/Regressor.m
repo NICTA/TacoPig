@@ -1,4 +1,4 @@
-% A standard GP-regression model
+% Standard GP-regression model
 
 classdef Regressor < tacopig.gp.GpCore
     
@@ -24,6 +24,9 @@ classdef Regressor < tacopig.gp.GpCore
    
     methods
         
+        par = this.getCovPar(GP);
+        
+        
         % Constructor - default settings
         function this = Regressor()
              
@@ -47,9 +50,9 @@ classdef Regressor < tacopig.gp.GpCore
             this.check(); 
             
             % Invoke the components
-            mu = this.MeanFn.eval(this.X, this.meanpar);
-            K0 = this.CovFn.Keval(this.X, this.covpar);
-            noise = this.NoiseFn.eval(this, this.noisepar);
+            mu = this.MeanFn.eval(this.X, this);
+            K0 = this.CovFn.Keval(this.X, this);
+            noise = this.NoiseFn.eval(this.X, this);
             
             K = K0 + noise;
             ym = (this.y - mu)';
@@ -141,7 +144,7 @@ classdef Regressor < tacopig.gp.GpCore
             
             % we are currently handling the possibility of multi-task with
             % common points as a general case of GP_Std
-            mu_0 = this.MeanFn.eval(x_star, this.meanpar);
+            mu_0 = this.MeanFn.eval(x_star, this);
             
             partitions = round(linspace(1, nx+1, batches+1));
             
@@ -158,12 +161,12 @@ classdef Regressor < tacopig.gp.GpCore
                 end
                 
                 % Compute Predictive Mean
-                ks = this.CovFn.eval(this.X,x_star(:,LR),this.covpar)';
+                ks = this.CovFn.eval(this.X,x_star(:,LR),this)';
                 mu_star(LR) = mu_0(LR) + (ks*this.alpha)';
 
                 if (nargout>=2)
                     % Compute predictive variance
-                    var0 = this.CovFn.pointval(x_star(:,LR), this.covpar);
+                    var0 = this.CovFn.pointval(x_star(:,LR), this);
                     if use_svd
                         %S2 = S2(:,ones(1,size(x_star(:,LR),2)));
                         v = bsxfun(@times, factorS, (ks*this.factors.SVD_U)');
@@ -178,7 +181,7 @@ classdef Regressor < tacopig.gp.GpCore
                         % we also want the block
                         % Can only get here if batches is set to 1
                         
-                        var0 = this.CovFn.Keval(x_star(:,LR), this.covpar);
+                        var0 = this.CovFn.Keval(x_star(:,LR), this);
                         var_full = var0-v'*v;
                     end
                 end
@@ -186,9 +189,9 @@ classdef Regressor < tacopig.gp.GpCore
             end
         end
         
+        
         % Learn the hyperparameters        
         function theta = learn(this)
-            
             % Check configuration
             this.check();
 
@@ -220,15 +223,15 @@ classdef Regressor < tacopig.gp.GpCore
         function [f_star] = sampleprior(this, x_star)
             this.check();
             nx = size(x_star,2);  
-            if (nx>2000)&&this.verbose
+            if (nx>3000)&&this.verbose
                 disp(['Warning: Large number of query points.'...
                     'This may result in considerable computational time.'...
                     'Press Ctrl+C to abort or any other key to continue.'])
                 pause
             end
-            Mu_0= this.MeanFn.eval(x_star, this.meanpar);
-            kss = this.CovFn.eval(x_star,x_star,this.covpar);
-            Lss = chol(kss+diag(diag(kss))*1e-4, 'lower');
+            Mu_0 = this.MeanFn.eval(x_star, this);
+            kss  = this.CovFn.eval(x_star,x_star, this);
+            Lss  = chol(kss+diag(diag(kss))*1e-4, 'lower');
             f_star = [Lss*randn(1,nx)']'+Mu_0;
         end
        
