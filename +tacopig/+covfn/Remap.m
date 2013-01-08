@@ -5,18 +5,17 @@
 classdef Remap < tacopig.covfn.CovFunc
 
     properties(Constant)
-        % test dimensions = 3
-        teststring = 'Remap(tacopig.covfn.SqExp(), [1 1 2 3])';
+        ExampleUsage = 'Remap(tacopig.covfn.SqExp(), [1 1 2 3])'; %Instance of class created for testing
     end
     properties
-       indx
-       covfn
+       covfn   % The covariance function to which the remapping of hyperparameters is applied
+       indx    % A vector indicating the mapping of the hyperparameter vector to the shorter vector used during learning
     end
     
     methods
         
         function this = Remap(covfn, indx)
-            
+        % Constructor    
            if ~isa(covfn,'tacopig.covfn.CovFunc')
                error([class(this),': must specify a valid covariance function']); 
            end
@@ -25,6 +24,7 @@ classdef Remap < tacopig.covfn.CovFunc
         end   
             
         function n_theta = npar(this,D)
+            % Returns the number of hyperparameters required by the Remap instance
             n_dep = this.covfn.npar(D);
             indx = this.indx;
             if (n_dep~=length(indx))
@@ -37,6 +37,7 @@ classdef Remap < tacopig.covfn.CovFunc
         end
         
         function K = eval(this, X1, X2, GP)
+            %Get covariance matrix between input sets X1,X2 
             parin = this.getCovPar(GP);
             [D,N1] = size(X1); %number of points in X1
              if (length(parin)~=this.npar(D))
@@ -47,6 +48,7 @@ classdef Remap < tacopig.covfn.CovFunc
         end
         
         function K = Keval(this, X, GP)
+            % Evaluation of k(X,X) (symmetric case)            
             parin = this.getCovPar(GP);
             [D,N1] = size(X); %number of points in X1
              if (length(parin)~=this.npar(D))
@@ -57,6 +59,7 @@ classdef Remap < tacopig.covfn.CovFunc
         end
         
         function g = gradient(this,X, GP)
+            % Returns gradient of k(X,X) with respect to each hyperparameter
             parin = this.getCovPar(GP);
             % Have to be careful and add the gradients here            
             indx = this.indx;

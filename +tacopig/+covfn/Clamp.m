@@ -1,19 +1,22 @@
-% Allows a projection matrix like G to be applied around the kernel
+% Clamps specific parameters of a covariance function so that they are not
+% altered during the learning phase.
+
 classdef Clamp < tacopig.covfn.CovFunc
     
     properties(Constant)
-        teststring = 'Clamp(tacopig.covfn.SqExp(), 1, 2)';
+        ExampleUsage = 'tacopig.covfn.Clamp(tacopig.covfn.SqExp(), 1, 2)'; %Instance of class created for testing
     end
     
     properties
-       indx
-       value
-       covfn
+       indx     % index of hypermeter(s) to be clamped
+       value    % value(s) of clamped hypermeter(s)
+       covfn    % the constructor of the covariance function whose hyperparameter(s) are to be clamped
     end
     
     methods
         
         function this = Clamp(covfn, indx, value)
+           % Clamp covariance function constructor
            if ~isa(covfn,'tacopig.covfn.CovFunc')
                error('tacopig:badConfiguration', [class(this),': must specify a valid covariance function']); 
            end
@@ -23,10 +26,12 @@ classdef Clamp < tacopig.covfn.CovFunc
         end   
             
         function n_theta = npar(this,D)
+            % Returns the number of free hyperparameters required by the covariance function
             n_theta = this.covfn.npar(D) - length(this.indx);
         end
         
         function K = eval(this, X1, X2, GP)
+            %Get covariance matrix between input sets X1,X2
             parin = this.getCovPar(GP);
             if (length(parin)~=this.npar(size(X1,1)))
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
@@ -36,6 +41,7 @@ classdef Clamp < tacopig.covfn.CovFunc
         end
         
         function K = Keval(this, X, GP)
+            % Evaluation of k(X,X) (symmetric case)
             parin = this.getCovPar(GP);
             if (length(parin)~=this.npar(size(X,1)))
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
@@ -45,6 +51,7 @@ classdef Clamp < tacopig.covfn.CovFunc
         end
         
         function g = gradient(this,X, GP)
+            % Returns gradient of k(X,X) with respect to each hyperparameter
             parin = this.getCovPar(GP);
             % Inefficiency at the cost of being clean
             % The alternative is to have a gradient method that takes as an
@@ -65,6 +72,9 @@ classdef Clamp < tacopig.covfn.CovFunc
             par = this.getpar(parin, size(x_star,1));
             v = this.covfn.pointval(x_star, par);
         end
+    end
+    
+    methods(Access = private)
         
         function [par,nindx] = getpar(this, parin, D)
             indx = this.indx;
@@ -75,6 +85,7 @@ classdef Clamp < tacopig.covfn.CovFunc
             par(nindx) = parin;
             par(indx) = this.value;
         end
-        
     end
+        
+
 end

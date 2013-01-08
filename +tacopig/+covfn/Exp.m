@@ -1,12 +1,35 @@
-classdef Exp < tacopig.covfn.CovFunc
+% The Exponential covariance function class
+% k(X1,X2) = Sigma_f^2*exp(-sqrt((X1-X2)'*diag(Lengthscales.^-2)*(X1-X2)))
+%
+% X1 and X2 are input matrices of dimensionality D x N and D x M, respectively. 
+% D is the dimesionality of the data. 
+% N and M are the number of observations in the matrix X1 and X2, respectively.
+% k(X1,X2) is a N x M covariance matrix
+%
+% Note on hyperparameters:
+% The hyperparameter vector has a dimensionality of 1 x (D+1) and is of the form [Lengthscales, Sigma_f]
+% Sigma_f is the signal variance hyperpameter 
+% Lengthscales is a 1 x D matrix
 
+classdef Exp < tacopig.covfn.CovFunc
+      
+    properties(Constant)
+        ExampleUsage = 'tacopig.covfn.Exp()'; %Instance of class created for testing
+    end
+      
     methods
+
+        function this = Exp() 
+        % Exponential constructor
+        end    
         
         function n_theta = npar(this, D)
+        % Returns the number of hyperparameters required by the covariance function
             n_theta = D+1; % each dimension + signal variance
         end
         
         function [K z] = eval(this, X1, X2, GP)
+            %Get covariance matrix between input sets X1,X2 
             par = this.getCovPar(GP);
             [D,N1] = size(X1); %number of points in X1
             N2 = size(X2,2); %number of points in X2
@@ -29,6 +52,7 @@ classdef Exp < tacopig.covfn.CovFunc
         end
         
         function [g] = gradient(this, X, GP)
+            % Returns gradient of k(X,X) with respect to each hyperparameter
             par = this.getCovPar(GP);
             %Gradient currently not working correctly.
             epsilon = 1e-10; 

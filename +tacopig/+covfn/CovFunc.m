@@ -17,8 +17,9 @@ classdef CovFunc < tacopig.taco
 
         % just run with the default constructor
         
-        % Efficient case for getting Kx*x* (just points)
+        
         function v = pointval(this, x_star, GP)
+        % Efficient case for getting diag(k(X,X))
             nstar = size(x_star,2);
             v = zeros(1,nstar);
             for i=1:nstar
@@ -28,17 +29,20 @@ classdef CovFunc < tacopig.taco
         end
    
         
-        % Evaluation of K(X,X) (symmetric case)
+        
         function K = Keval(this, X, GP)
+        % Evaluation of k(X,X) (symmetric case)
             K = this.eval(X,X,GP);
         end
         
-        % Gradient of K(X,X) (stub)
+        
         function gradient(this)
+            % Returns gradient of k(X,X) with respect to each hyperparameter
             error('tacopig:badConfiguration',[class(this),' does not implement gradients!']);
         end
         
         function theta = getCovPar(this, GP)
+            % Returns the covariance function's hyperparameters
             if isa(GP, 'tacopig.gp.GpCore')
                 theta = GP.covpar;
             elseif isa(GP, 'double')

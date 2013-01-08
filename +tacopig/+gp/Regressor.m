@@ -8,7 +8,7 @@ classdef Regressor < tacopig.gp.GpCore
         meanpar             % Mean Function Parameters
         covpar              % Covariance Function Parameters
         noisepar            % Noise Function Parameters
-        alpha               % cached K^-1y
+        alpha               % cached (K^(-1))y
         opts                % Optimiser options vector
         
         objective_function  % optimisation criteria for learning
@@ -18,17 +18,27 @@ classdef Regressor < tacopig.gp.GpCore
         factors             % Factors produced by the factorisation
         has_been_solved     % Flag to stop premature querying of a model
         lml                 % log marginal likelihood of training data
-        verbose             % Should friendly warnings & progress be displayed?
+        verbose             % Switch for friendly warnings & progress display
     end
     
    
     methods
+ 
         
-        par = this.getCovPar(GP);
-        
-        
-        % Constructor - default settings
         function this = Regressor()
+        % Constructor - default settings
+        % Defaults:
+        %          factorisation = 'chol';
+        %          objective_function = @tacopig.objectivefn.NLML;
+        %          solver_function = @(fn, x0, opts) minFunc(fn, x0', opts); 
+        %          has_been_solved = 0;
+        %          verbose = true;
+        %          
+        %          Options passed to optimiser:
+        %          opts = [];
+        %          opts.Method = 'lbfgs';
+        %          opts.numDiff = 0;
+        %              
              
              this.factorisation = 'chol';
              this.objective_function = @tacopig.objectivefn.NLML;
@@ -43,9 +53,10 @@ classdef Regressor < tacopig.gp.GpCore
         end
                 
         
-        % Run the GP Inference
+        
         function solve(this)
-
+        % Run the GP Inference
+        
             % Check validity of current configuration
             this.check(); 
             
@@ -219,8 +230,8 @@ classdef Regressor < tacopig.gp.GpCore
         end
         
         
-        % Draw samples from the prior distribution        
         function [f_star] = sampleprior(this, x_star)
+        % Draw samples from the prior distribution        
             this.check();
             nx = size(x_star,2);  
             if (nx>3000)&&this.verbose
@@ -235,10 +246,13 @@ classdef Regressor < tacopig.gp.GpCore
             f_star = [Lss*randn(1,nx)']'+Mu_0;
         end
        
-        % Sample from the posterior distribution        
         function [f_star] = sampleposterior(this, x_star)
+        % Sample from the posterior distribution at test points passed as an arguments
+        % [f_star] = sampleposterior(this, x_star)
+        % Inputs : x_star (test points)
+        % Outputs : f_star ()
+        
             this.check();
-            
             if (~this.has_been_solved)
                 error('GP must be solved first using GP.solve().');
             end
@@ -256,8 +270,8 @@ classdef Regressor < tacopig.gp.GpCore
             f_star = randn(1,nx)*LFull' +mu_star;
         end
         
-        % Pass through objective function
         function [objective, objective_grad] = objectfun(this, parvec)
+        % Returns the value of the objective function for the current set of hyperparameters and training points
             if (nargout == 2)
                 [objective, objective_grad] = this.objective_function(this, parvec);
             elseif (nargout == 1)
@@ -267,9 +281,8 @@ classdef Regressor < tacopig.gp.GpCore
             end
         end
         
-        % Check the inputs are of an appropriate form        
         function check(this)
-            % Check that all the values are properly set
+        % Returns error if a property of the GP class has been initialised incorrectly
             [D,N] = size(this.X);
             use_svd = strcmpi(this.factorisation, 'svd');
             use_chol = strcmpi(this.factorisation, 'chol');
@@ -296,9 +309,8 @@ classdef Regressor < tacopig.gp.GpCore
             return;
         end
 
-        % Compare analytic with numerical gradients       
         function [analytic, numerical] = check_gradients(this,params)
-            
+            % Compare analytic with numerical gradients of the objective function with respect to each hyperparameter       
             if strcmpi(optimget(this.opts, 'GradObj'), 'off')
                 error('tacopig:badConfiguration', 'Gradients are turned off.');
             end

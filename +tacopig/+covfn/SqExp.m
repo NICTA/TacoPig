@@ -1,9 +1,32 @@
+% The Squared Exponential covariance function class
+% k(X1,X2) = Sigma_f^2*exp(-0.5*(X1-X2)'*diag(Lengthscales.^-2)*(X1-X2))
+%
+% X1 and X2 are input matrices of dimensionality D x N and D x M, respectively. 
+% D is the dimesionality of the data. 
+% N and M are the number of observations in the matrix X1 and X2, respectively.
+% k(X1,X2) is a N x M covariance matrix
+%
+% Note on hyperparameters:
+% The hyperparameter vector has a dimensionality of 1 x (D+1) and is of the form [Lengthscales, Sigma_f]
+% Sigma_f is the signal variance hyperpameter 
+% Lengthscales is a 1 x D matrix
+
+
 classdef SqExp < tacopig.covfn.CovFunc
-   
-    % Most covariance functions will be static
+    
+    properties(Constant)
+        ExampleUsage = 'tacopig.covfn.SqExp()'; %Instance of class created for testing
+    end
+    
+    
     methods 
         
+        function this = SqExp() 
+        % Squared exponential constructor
+        end   
+        
         function n_theta = npar(this,D)
+            % Returns the number of hyperparameters required by the covariance function
             if D <= 0
               error('tacopig:inputOutOfRange', 'Dimension cannot be < 1');
             end
@@ -14,7 +37,7 @@ classdef SqExp < tacopig.covfn.CovFunc
         end
         
         function K = eval(this, X1, X2, GP)
-            par = this.getCovPar(GP);
+            %Get covariance matrix between input sets X1,X2
             [D,N1] = size(X1); %number of points in X1
             N2 = size(X2,2); %number of points in X2
             if D~=size(X2,1)
@@ -35,6 +58,7 @@ classdef SqExp < tacopig.covfn.CovFunc
         end
         
         function [g] = gradient(this,X, GP)
+            % Returns gradient of k(X,X) with respect to each hyperparameter
             par = this.getCovPar(GP);
             % Same as K?
             Kg = this.eval(X, X, par);
