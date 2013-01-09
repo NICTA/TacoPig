@@ -15,16 +15,16 @@ classdef GpCore < tacopig.taco
     % Methods that all GP models are required to implement
     methods (Abstract)
         
-        % Automatic model selection
+        % Automatic model selection. (Required method for all GP classes)
         learn(this);                        
         
-        % Probabilistic inference
+        % Probabilistic inference. (Required method for all GP classes)
         solve(this);
         
-        % Batch querying
+        % Batch querying. (Required method for all GP classes)
         [mu, var] = query(this, xstar);
         
-        % Objective function for learning
+        % Objective function for learning. (Required method for all GP classes)
         [o, ograd] = objectfun(theta);
         
     end

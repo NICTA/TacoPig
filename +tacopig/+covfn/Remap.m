@@ -15,7 +15,13 @@ classdef Remap < tacopig.covfn.CovFunc
     methods
         
         function this = Remap(covfn, indx)
-        % Constructor    
+        % Constructor  
+        %
+        % GP.CovFn = tacopig.covfn.Remap(covfn, indx)
+        %
+        % Inputs:   covfn  = The covariance function to which the remapping of hyperparameters is applied
+        %           indx = A vector indicating the mapping of the hyperparameter vector to the shorter vector
+        
            if ~isa(covfn,'tacopig.covfn.CovFunc')
                error([class(this),': must specify a valid covariance function']); 
            end
@@ -25,6 +31,14 @@ classdef Remap < tacopig.covfn.CovFunc
             
         function n_theta = npar(this,D)
             % Returns the number of hyperparameters required by the Remap instance
+            %
+            % n_theta = Gp.CovFn.npar(D)
+            %
+            % Gp.CovFn is an instantiation of the Remap covariance function class
+            %
+            % Inputs : D = Dimensionality
+            % Outputs: n_theta = number of hyperparameters required by the Remap instance
+            
             n_dep = this.covfn.npar(D);
             indx = this.indx;
             if (n_dep~=length(indx))
@@ -37,7 +51,17 @@ classdef Remap < tacopig.covfn.CovFunc
         end
         
         function K = eval(this, X1, X2, GP)
-            %Get covariance matrix between input sets X1,X2 
+            % Get covariance matrix between input sets X1,X2
+            %
+            % K = Gp.CovFn.eval(X1, X2, GP)
+            %
+            % Gp.CovFn is an instantiation of the Remap covariance function class
+            %
+            % Inputs:  X1 = D x N Input locations
+            %          X2 = D x M Input locations
+            %          GP = The GP class instance can be passed to give the covariance function access to its properties
+            % Outputs: K = covariance matrix between input sets X1,X2 (N x M)
+            
             parin = this.getCovPar(GP);
             [D,N1] = size(X1); %number of points in X1
              if (length(parin)~=this.npar(D))
@@ -48,7 +72,16 @@ classdef Remap < tacopig.covfn.CovFunc
         end
         
         function K = Keval(this, X, GP)
-            % Evaluation of k(X,X) (symmetric case)            
+            % Evaluation of k(X,X) (symmetric case)
+            % Get covariance matrix between input sets X1,X2
+            %
+            % K = Gp.CovFn.Keval(X, GP)
+            %
+            % Gp.CovFn is an instantiation of the Remap covariance function class
+            %
+            % Inputs:  X = D x N Input locations
+            %          GP = The GP class instance can be passed to give the covariance function access to its properties
+            % Outputs: K = covariance matrix between input sets X1 and itself (N x N)
             parin = this.getCovPar(GP);
             [D,N1] = size(X); %number of points in X1
              if (length(parin)~=this.npar(D))
@@ -59,7 +92,15 @@ classdef Remap < tacopig.covfn.CovFunc
         end
         
         function g = gradient(this,X, GP)
-            % Returns gradient of k(X,X) with respect to each hyperparameter
+            % Returns gradient of the covariance matrix k(X,X) with respect to each hyperparameter
+            % g = Gp.CovFn.gradient(X, GP)
+            %
+            % Gp.CovFn is an instantiation of the Remap covariance function class
+            %
+            % Inputs:   X = D x N Input locations
+            %           GP = The GP class instance can be passed to give the covariance function access to its properties
+            % Outputs:  g = gradient of the covariance matrix k(X,X) with respect to each hyperparameter
+
             parin = this.getCovPar(GP);
             % Have to be careful and add the gradients here            
             indx = this.indx;
@@ -83,6 +124,14 @@ classdef Remap < tacopig.covfn.CovFunc
         
         % Overload the point covariance - its trivial to add them
         function v = pointval(this, x_star, GP)
+            % Efficient case for getting diag(k(x_star,x_star))
+            % v = Gp.CovFn.pointval(X, GP)
+            %
+            % Gp.CovFn is an instantiation of the Remap covariance function class
+            %
+            % Inputs : X = (D x n) Input locations
+            % Output : v = diag(k(X,X))
+        
              parin = this.getCovPar(GP);
              [D,N1] = size(x_star); %number of points in X1
              if (length(parin)~=this.npar(D))
