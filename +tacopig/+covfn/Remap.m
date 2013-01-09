@@ -5,7 +5,7 @@
 classdef Remap < tacopig.covfn.CovFunc
 
     properties(Constant)
-        ExampleUsage = 'Remap(tacopig.covfn.SqExp(), [1 1 2 3])'; %Instance of class created for testing
+        ExampleUsage = 'tacopig.covfn.Remap(tacopig.covfn.SqExp(), [1 1 2 3])'; %Instance of class created for testing
     end
     properties
        covfn   % The covariance function to which the remapping of hyperparameters is applied

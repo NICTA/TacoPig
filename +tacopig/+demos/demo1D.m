@@ -4,9 +4,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Add optimization folder
-
 if ~exist('minfunc')
-    warning('It looks like you need to add minfunc to your default path...\n');
+    fprintf('It looks like you need to add minfunc to your default path...\n');
+    fprintf('(Add tacopig/optimization/minfunc{/mex} to pathdef.m for permanent access)\n');
     fprintf('Press any key to attempt to continue...\n');
     pause();
 end
@@ -35,7 +35,6 @@ X = [-7.3005, -6.3772, -6.3481, -5.8868, -4.7591, -4.0911, -3.7461,...
 y = [ -3.1593, -2.6634, -2.6364, -2.5123, -2.0282, -2.2231, -2.4161,...
     -2.1390, -1.5605, -1.4464, -0.4838, -0.2821, -1.4956,...
     -1.6061, -2.8353, -2.7971, -2.5217, -2.2265, -2.1399];
-
 
 
 xstar = linspace(-8, 8, 201); 

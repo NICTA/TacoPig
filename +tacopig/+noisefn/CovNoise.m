@@ -8,7 +8,7 @@ classdef CovNoise < tacopig.noisefn.NoiseFunc
     end
     
     properties(Constant)
-        teststring = 'CovNoise(tacopig.covfn.SqExp())';
+        ExampleUsage = 'tacopig.noisefn.CovNoise(tacopig.covfn.SqExp())';
     end
     
     methods

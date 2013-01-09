@@ -28,9 +28,9 @@ classdef MeanFunc < tacopig.taco
         % Returns the mean gradient with respect to the parameters. Stub that may be overloaded
             error([class(this),' does not implement gradients!']);
         end
-        
-        function theta = getMeanPar(this, GP)
-        % Returns the parameters of the mean function    
+    end
+    methods(Static)
+        function theta = getMeanPar(GP)
             if isa(GP, 'tacopig.gp.GpCore')
                 theta = GP.meanpar;
             elseif isa(GP, 'double')

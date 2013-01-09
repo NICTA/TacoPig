@@ -8,7 +8,7 @@ classdef Clamp < tacopig.noisefn.NoiseFunc
     end
     
     properties(Constant)
-        teststring = 'Clamp(tacopig.noisefn.Stationary(), 1, 0)';
+        ExampleUsage = 'tacopig.noisefn.Clamp(tacopig.noisefn.Stationary(), 1, 0)';
     end
     
     methods

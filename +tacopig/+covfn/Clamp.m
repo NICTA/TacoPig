@@ -73,7 +73,7 @@ classdef Clamp < tacopig.covfn.CovFunc
             % Inputs:  X = D x N Input locations
             %          GP = The GP class instance can be passed to give the covariance function access to its properties
             % Outputs: K = covariance matrix between input sets X1 and itself (N x N)            parin = this.getCovPar(GP);
-            
+            parin = this.getCovPar(GP);
             if (length(parin)~=this.npar(size(X,1)))
                 error('tacopig:inputInvalidLength','Wrong number of hyperparameters!');
             end

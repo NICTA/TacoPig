@@ -38,6 +38,7 @@ classdef SqExp < tacopig.covfn.CovFunc
         
         function K = eval(this, X1, X2, GP)
             %Get covariance matrix between input sets X1,X2
+            par = this.getCovPar(GP);
             [D,N1] = size(X1); %number of points in X1
             N2 = size(X2,2); %number of points in X2
             if D~=size(X2,1)

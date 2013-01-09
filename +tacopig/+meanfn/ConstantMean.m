@@ -8,7 +8,7 @@ classdef ConstantMean < tacopig.meanfn.MeanFunc
     end
 
     properties (Constant)
-        teststring = 'ConstantMean(0)';
+        ExampleUsage = 'tacopig.meanfn.ConstantMean(0)';
     end
     
     

@@ -5,7 +5,7 @@
 classdef Sum < tacopig.covfn.CovFunc
     
     properties(Constant)
-        ExampleUsage = 'Sum(tacopig.covfn.Mat3(), tacopig.covfn.SqExp())'; %Instance of class created for testing
+        ExampleUsage = 'tacopig.covfn.Sum(tacopig.covfn.Mat3(), tacopig.covfn.SqExp())'; %Instance of class created for testing
     end
     
     properties

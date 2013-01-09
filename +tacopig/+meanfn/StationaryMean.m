@@ -10,7 +10,7 @@ classdef StationaryMean < tacopig.meanfn.MeanFunc
         end
         
         function mu = eval(X, GP) 
-            par = this.getMeanPar(GP);
+            par = tacopig.meanfn.MeanFunc.getMeanPar(GP);
             if (numel(par)~=1)
                 error('tacopig:inputInvalidLength','wrong number of hyperparameters!')
             end
