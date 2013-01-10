@@ -14,6 +14,12 @@ classdef Product < tacopig.covfn.CovFunc
     
     methods
         function this = Product(varargin) 
+            % Product covariance function constructor
+            %
+            % GP.CovFn = tacopig.covfn.Product(covfunc1, covfunc2, ...)
+            %
+            % Inputs: covfunc1 (An instance of a covariance function that will be dot multiplied by the others
+
         % Product covariance function constructor
            n_children = length(varargin);
 
@@ -27,7 +33,13 @@ classdef Product < tacopig.covfn.CovFunc
             
         function n_theta = npar(this,D)
         % Returns the number of hyperparameters required by all of the children covariance functions
-            n_children = length(this.Children);
+        %
+        % n_theta = GP.covfunc.npar(D)
+        %
+        % Gp.CovFn is an instantiation of the Prod covariance function class
+        % Inputs: D (Dimensionality of the dataset)
+        % Outputs: n_theta (number of hyperparameters required by all of the children covariance function)
+                    n_children = length(this.Children);
             n_theta = 0;
             for i=1:n_children
                 n_theta = n_theta + this.Children{i}.npar(D);
@@ -36,6 +48,15 @@ classdef Product < tacopig.covfn.CovFunc
         
         function K = eval(this, X1, X2, GP)
             %Get covariance matrix between input sets X1,X2 
+            %
+            % K = GP.covfunc.eval(X1, X2, GP)
+            %
+            % Gp.CovFn is an instantiation of the Prod covariance function class
+            % Inputs:  X1 = Input locations (D x N matrix)
+            %          X2 = Input locations (D x M matrix)
+            %          GP = The GP class instance can be passed to give the covariance function access to its properties
+            % Outputs: K = covariance matrix between input sets X1,X2 (N x M) 
+            
             par = this.getCovPar(GP);
             D = size(X1,1); % number of points in X1
             if D~=size(X2,1)
@@ -67,7 +88,15 @@ classdef Product < tacopig.covfn.CovFunc
         
         
          function K = Keval(this, X, GP)
-            % Evaluation of k(X,X) (symmetric case)
+         % Evaluation of k(X,X) (symmetric case)
+         % 
+         % K = Keval(X, GP)
+         %
+         % Gp.CovFn is an instantiation of the Prod covariance function class
+         %
+         % Inputs:  X = Input locations (D x N matrix)
+         %          GP = The GP class instance can be passed to give the covariance function access to its properties
+         % Outputs: K = covariance matrix between input sets X and itself (N x N)    
             par = this.getCovPar(GP);
             D = size(X,1); %number of points in X1
             npar = length(par);
@@ -90,7 +119,14 @@ classdef Product < tacopig.covfn.CovFunc
         end
         
         function g = gradient(this,X, GP)
-            % Returns gradient of k(X,X) with respect to each hyperparameter
+        % Returns gradient of the covariance matrix k(X,X) with respect to each hyperparameter
+        % g = Gp.CovFn.gradient(X, GP)
+        %
+        % Gp.CovFn is an instantiation of the Prod covariance function class
+        %
+        % Inputs:   X = Input locations (D x N matrix)
+        %           GP = The GP class instance can be passed to give the covariance function access to its properties
+        % Outputs:  g = gradient of the covariance matrix k(X,X) with respect to each hyperparameter. Cell Array (1 x Number of Hyperparameters). Each Element is a N x N matrix
             par = this.getCovPar(GP);
             [D,N] = size(X);
             npar = length(par);
@@ -129,6 +165,14 @@ classdef Product < tacopig.covfn.CovFunc
         
         % Overload the point covariance - its trivial to add them
         function v = pointval(this, x_star, GP)
+            % Efficient case for getting diag(k(X,X))
+            % v = Gp.CovFn.pointval(X, GP)
+            %
+            % Gp.CovFn is an instantiation of the Prod covariance function class
+            %
+            % Inputs : X = Input locations (D x n matrix)
+            % Output : v = diag(k(X,X))
+            
             par = this.getCovPar(GP);
             [D,N] = size(x_star);
             npar = length(par);

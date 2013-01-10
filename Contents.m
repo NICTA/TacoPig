@@ -25,6 +25,7 @@
 %   tacopig.noisefn.Clamp           - Function that fixes specified hyperparameters of a noise function during training
 %   tacopig.noisefn.NoiseFunc       - Noise function abstract class
 %   tacopig.noisefn.Stationary      - A constant global noise value that is learnt during the hyperparameter training phase
+%   tacopig.noisefn.LogStationary   - Same as Stationary except the parameter that is passed to the noise function is the log of the true noise.
 %
 %  Objective Functions: Functions that are minimised during the training phase
 %   tacopig.objectivefn.CrossVal    - k-fold cross validation (Currently set to k = 5)

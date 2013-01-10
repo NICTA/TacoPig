@@ -34,7 +34,7 @@ classdef CovFunc < tacopig.taco
         %         v = GP.covfn.npar.pointval(X, GP)
         %
         % Gp.CovFn is an instantiation of the covariance function class 
-        % Inputs : X1    - D x N input points            
+        % Inputs : X    - D x N input points            
         %          GP = The GP class instance can be passed to give the covariance function access to its properties
         % Outputs : v = diag(k(X,X)) (The diagnal of the covariance between)
         

@@ -1,4 +1,18 @@
- function [crossvalerr crossvalerr_grad] = CrossVal(this, parvec, NumFolds)
+% The cross validation objective function.
+% It withholds a prespecified portion of the data (default is 1/5) and
+% trains on the remainder. The performance of the model with the parameters
+% is evaluated on the withheld set. This is repeated with a different portion of the data withheld 
+% each time until each data point has been withheld once. The negative log likelihood
+% from each trial is summed and passed as the output - crossvalerr.
+%
+% [nlml, nlmlg] = GP.objectivefn.NLML(parvec,NumFolds)
+%
+% Inputs: parvec = a concatinated vector of the mean function, covariance function and noise funtion's parameters/hyperparameters.
+%         NumFolds = The number of cross validation folds
+% Outputs: crossvalerr = cross validation error
+%          crossvalerr_grad = the gradient of the cross validation error with respect to each of the parameters in parvec.
+ 
+function [crossvalerr crossvalerr_grad] = CrossVal(this, parvec, NumFolds)
             
             if (nargin<3)
                 NumFolds = 5;

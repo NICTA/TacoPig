@@ -20,16 +20,33 @@ classdef Exp < tacopig.covfn.CovFunc
     methods
 
         function this = Exp() 
-        % Exponential constructor
+            % Exp covariance function constructor
+            % GP.CovFn = tacopig.covfn.Mat3()
+            % Gp.CovFn is an instantiation of the SqExp covariance function class 
         end    
         
         function n_theta = npar(this, D)
-        % Returns the number of hyperparameters required by the covariance function
+            % Returns the number of hyperparameters required by all of the children covariance functions
+            %
+            % n_theta = GP.covfunc.npar(D)
+            %
+            % Gp.CovFn is an instantiation of the Exp covariance function class
+            % Inputs: D (Dimensionality of the dataset)
+            % Outputs: n_theta (number of hyperparameters required by all of the children covariance function)
             n_theta = D+1; % each dimension + signal variance
         end
         
         function [K z] = eval(this, X1, X2, GP)
-            %Get covariance matrix between input sets X1,X2 
+            % Get covariance matrix between input sets X1,X2 
+            %
+            % K = GP.covfunc.eval(X1, X2, GP)
+            %
+            % Gp.CovFn is an instantiation of the Exp covariance function class
+            % Inputs:  X1 = D x N Input locations
+            %          X2 = D x M Input locations
+            %          GP = The GP class instance can be passed to give the covariance function access to its properties
+            % Outputs: K = covariance matrix between input sets X1,X2 (N x M)
+            
             par = this.getCovPar(GP);
             [D,N1] = size(X1); %number of points in X1
             N2 = size(X2,2); %number of points in X2
@@ -52,7 +69,15 @@ classdef Exp < tacopig.covfn.CovFunc
         end
         
         function [g] = gradient(this, X, GP)
-            % Returns gradient of k(X,X) with respect to each hyperparameter
+            % Returns gradient of the covariance matrix k(X,X) with respect to each hyperparameter
+            % g = Gp.CovFn.gradient(X, GP)
+            %
+            % Gp.CovFn is an instantiation of the Exp covariance function class
+            %
+            % Inputs:   X = Input locations (D x N matrix)
+            %           GP = The GP class instance can be passed to give the covariance function access to its properties
+            % Outputs:  g = gradient of the covariance matrix k(X,X) with respect to each hyperparameter. Cell Array (1 x Number of Hyperparameters). Each Element is a N x N matrix
+            
             par = this.getCovPar(GP);
             %Gradient currently not working correctly.
             epsilon = 1e-10; 
@@ -78,6 +103,14 @@ classdef Exp < tacopig.covfn.CovFunc
         
         % Also overload the point covariance kx*x* - its trivial
         function v = pointval(this, x_star, GP)
+            % Efficient case for getting diag(k(X,X))
+            % v = Gp.CovFn.pointval(X, GP)
+            %
+            % Gp.CovFn is an instantiation of the Exp covariance function class
+            %
+            % Inputs : X = Input locations (D x n matrix)
+            % Output : v = diag(k(X,X))
+            
             par = this.getCovPar(GP);
             [D,N1] = size(x_star); %number of points in X1
             if (length(par)~=D+1)

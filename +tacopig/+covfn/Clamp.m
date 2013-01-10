@@ -18,9 +18,10 @@ classdef Clamp < tacopig.covfn.CovFunc
         function this = Clamp(covfn, indx, value)
            % Clamp covariance function constructor
            %
-           % GP.CovFn = tacopig.covfn.Clamp(indx, value)
+           % GP.CovFn = tacopig.covfn.Clamp(covfn, indx, value)
            %
-           % Inputs:   indx      index of hypermeter(s) to be clamped
+           % Inputs:   covfn     the constructor of the covariance function whose hyperparameter(s) are to be clamped
+           %           indx      index of hypermeter(s) to be clamped
            %           value     value(s) of clamped hypermeter(s)
        
            if ~isa(covfn,'tacopig.covfn.CovFunc')
@@ -34,11 +35,11 @@ classdef Clamp < tacopig.covfn.CovFunc
         function n_theta = npar(this,D)
             % Returns the number of free hyperparameters required by the covariance function
             %
-            % n_theta = Gp.CovFn.npar(D)
+            % n_theta = GP.CovFn.npar(D)
             %
-            % Gp.CovFn is an instantiation of the Clamp covariance function class
+            % GP.CovFn is an instantiation of the Clamp covariance function class
             % Inputs: D = Dimensionality of the input data
-            % Outpus: n_theta = the number of free hyperparameters required by the covariance function
+            % Outputs: n_theta = the number of free hyperparameters required by the covariance function
             
             n_theta = this.covfn.npar(D) - length(this.indx);
         end
@@ -46,11 +47,11 @@ classdef Clamp < tacopig.covfn.CovFunc
         function K = eval(this, X1, X2, GP)
             %Get covariance matrix between input sets X1,X2
             %
-            % K = Gp.CovFn.eval(X1, X2, GP)
+            % K = GP.CovFn.eval(X1, X2, GP)
             %
-            % Gp.CovFn is an instantiation of the Clamp covariance function class
-            % Inputs:  X1 = D x N Input locations
-            %          X2 = D x M Input locations
+            % GP.CovFn is an instantiation of the Clamp covariance function class
+            % Inputs:  X1 = Input locations (D x N matrix)
+            %          X2 = Input locations (D x M matrix)
             %          GP = The GP class instance can be passed to give the covariance function access to its properties
             % Outputs: K = covariance matrix between input sets X1,X2 (N x M)
             
@@ -66,11 +67,11 @@ classdef Clamp < tacopig.covfn.CovFunc
             % Evaluation of k(X,X) (symmetric case)
             % Get covariance matrix between input sets X1,X2
             %
-            % K = Gp.CovFn.Keval(X, GP)
+            % K = GP.CovFn.Keval(X, GP)
             %
-            % Gp.CovFn is an instantiation of the Clamp covariance function class
+            % GP.CovFn is an instantiation of the Clamp covariance function class
             %
-            % Inputs:  X = D x N Input locations
+            % Inputs:  X = Input locations (D x N matrix)
             %          GP = The GP class instance can be passed to give the covariance function access to its properties
             % Outputs: K = covariance matrix between input sets X and itself (N x N)            
             parin = this.getCovPar(GP);
@@ -84,13 +85,14 @@ classdef Clamp < tacopig.covfn.CovFunc
         
         function g = gradient(this,X, GP)
             % Returns gradient of the covariance matrix k(X,X) with respect to each hyperparameter
-            % g = Gp.CovFn.gradient(X, GP)
+            % g = GP.CovFn.gradient(X, GP)
             %
-            % Gp.CovFn is an instantiation of the Clamp covariance function class
+            % GP.CovFn is an instantiation of the Clamp covariance function class
             %
-            % Inputs:   X = D x N Input locations
+            % Inputs:   X = Input locations (D x N matrix)
             %           GP = The GP class instance can be passed to give the covariance function access to its properties
-            % Outputs:  g = gradient of the covariance matrix k(X,X) with respect to each hyperparameter
+            % Outputs:  g = gradient of the covariance matrix k(X,X) with respect to each hyperparameter. Cell Array (1 x Number of Hyperparameters). Each Element is a N x N matrix
+
 
             
             parin = this.getCovPar(GP);
@@ -106,12 +108,12 @@ classdef Clamp < tacopig.covfn.CovFunc
         
         % Overload the point covariance - its trivial to add them
         function v = pointval(this, x_star, GP)
-            % Efficient case for getting diag(k(x_star,x_star))
-            % v = Gp.CovFn.pointval(X, GP)
+            % Efficient case for getting diag(k(X,X))
+            % v = GP.CovFn.pointval(X, GP)
             %
-            % Gp.CovFn is an instantiation of the Clamp covariance function class
+            % GP.CovFn is an instantiation of the Clamp covariance function class
             %
-            % Inputs : X = (D x n) Input locations
+            % Inputs : X = Input locations (D x n matrix)
             %          GP = The GP class instance can be passed to give the covariance function access to its properties
             % Output : v = diag(k(X,X))
             parin = this.getCovPar(GP);

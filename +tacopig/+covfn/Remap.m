@@ -57,8 +57,8 @@ classdef Remap < tacopig.covfn.CovFunc
             %
             % Gp.CovFn is an instantiation of the Remap covariance function class
             %
-            % Inputs:  X1 = D x N Input locations
-            %          X2 = D x M Input locations
+            % Inputs:  X1 = Input locations (D x N matrix)
+            %          X2 = Input locations (D x M matrix)
             %          GP = The GP class instance can be passed to give the covariance function access to its properties
             % Outputs: K = covariance matrix between input sets X1,X2 (N x M)
             
@@ -79,7 +79,7 @@ classdef Remap < tacopig.covfn.CovFunc
             %
             % Gp.CovFn is an instantiation of the Remap covariance function class
             %
-            % Inputs:  X = D x N Input locations
+            % Inputs:  X = Input locations (D x N matrix)
             %          GP = The GP class instance can be passed to give the covariance function access to its properties
             % Outputs: K = covariance matrix between input sets X and itself (N x N)
             parin = this.getCovPar(GP);
@@ -97,9 +97,10 @@ classdef Remap < tacopig.covfn.CovFunc
             %
             % Gp.CovFn is an instantiation of the Remap covariance function class
             %
-            % Inputs:   X = D x N Input locations
+            % Inputs:   X = Input locations (D x N matrix)
             %           GP = The GP class instance can be passed to give the covariance function access to its properties
-            % Outputs:  g = gradient of the covariance matrix k(X,X) with respect to each hyperparameter
+            % Outputs:  g = gradient of the covariance matrix k(X,X) with respect to each hyperparameter. Cell Array (1 x Number of Hyperparameters). Each Element is a N x N matrix
+
 
             parin = this.getCovPar(GP);
             % Have to be careful and add the gradients here            
@@ -124,12 +125,12 @@ classdef Remap < tacopig.covfn.CovFunc
         
         % Overload the point covariance - its trivial to add them
         function v = pointval(this, x_star, GP)
-            % Efficient case for getting diag(k(x_star,x_star))
+            % Efficient case for getting diag(k(X,X))
             % v = Gp.CovFn.pointval(X, GP)
             %
             % Gp.CovFn is an instantiation of the Remap covariance function class
             %
-            % Inputs : X = (D x n) Input locations
+            % Inputs : X = Input locations (D x n matrix)
             % Output : v = diag(k(X,X))
         
              parin = this.getCovPar(GP);

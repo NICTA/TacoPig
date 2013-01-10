@@ -1,5 +1,13 @@
+% The negative log marginal likelihood function
+% [nlml, nlmlg] = GP.objectivefn.NLML(parvec)
+% Inputs: parvec = a concatinated vector of the mean function, covariance
+%         function and noise funtion's parameters/hyperparameters.
+% Outputs: nlml = the negative log marginal likelihood
+%          nlmlg = the gradient of the log marginal likelihood with respect to each of the parameters in parvec.
+
 function [nlml, nlmlg] = NLML(this, parvec)
             
+
                 
             % Get configuration
             use_svd = strcmpi(this.factorisation, 'svd');

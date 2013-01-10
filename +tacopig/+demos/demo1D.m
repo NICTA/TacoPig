@@ -53,11 +53,11 @@ GP.X = X;
 GP.y = y;
 
 % Plug in the components
-GP.MeanFn  = tacopig.meanfn.ConstantMean(mean(y));
+GP.MeanFn  = tacopig.meanfn.FixedMean(mean(y));
 % GP.CovFn   = tacopig.covfn.Sum(tacopig.covfn.Mat3(),tacopig.covfn.SqExp());%SqExp();
 GP.CovFn   = tacopig.covfn.SqExp();
 GP.NoiseFn = tacopig.noisefn.Stationary();
-% GP.objective_function = @tacopig.objectivefn.NLML;
+% GP.objective_function = @tacopig.objectivefn.CrossVal;
 GP.objective_function = @tacopig.objectivefn.NLML;
 
 % GP.solver_function = @anneal;

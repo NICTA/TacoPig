@@ -2,9 +2,6 @@
 <toc version="2.0">
 
     <tocitem target="Landing_Page.htm">TacoPig
-	<tocitem target="demo1D.html" 
-                 image="HelpIcon.EXAMPLES">Help
-        </tocitem>
         <tocitem target="demo1D.html" 
                  image="HelpIcon.EXAMPLES">demo1D
         </tocitem>
