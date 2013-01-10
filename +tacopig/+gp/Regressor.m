@@ -233,7 +233,6 @@ classdef Regressor < tacopig.gp.GpCore
 
             % Pack hyperparameters into a single vector
             par0 = [this.meanpar, this.covpar, this.noisepar];
-
             [par,fval] = this.solver_function(@(theta) this.objectfun(theta), par0, this.opts);
              
              % some of the optimizers transpose par...
@@ -252,18 +251,23 @@ classdef Regressor < tacopig.gp.GpCore
             this.covpar = par(nmeanpar+(1:ncovpar));
             this.noisepar = par(ncovpar+nmeanpar+(1:nnoisepar));
             this.lml = - tacopig.objectivefn.NLML(this,par);
+            
+            % It hasnt been solved with the new parameters
+            this.has_been_solved = false;
+            
         end
         
         
-        function [f_star] = sampleprior(this, x_star)
+        function [f_star] = sampleprior(this, x_star, seed)
         % Draws samples from the prior distribution
         %
         % [f_star] = Regressor.sampleprior(x_star)
+        % [f_star] = Regressor.sampleprior(x_star, seed)
         %
         % Inputs: x_star (query points)
+        %       : seed (optional) for repeatable draws.
         %
         % Output: f_star (a sample from the prior at the query points)
-        
             this.check();
             nx = size(x_star,2);  
             if (nx>3000)&&this.verbose
@@ -275,13 +279,18 @@ classdef Regressor < tacopig.gp.GpCore
             Mu_0 = this.MeanFn.eval(x_star, this);
             kss  = this.CovFn.eval(x_star,x_star, this);
             Lss  = chol(kss+diag(diag(kss))*1e-4, 'lower');
+            if (nargin==3)
+                randn('seed', seed);
+            end
             f_star = [Lss*randn(1,nx)']'+Mu_0;
         end
        
-        function [f_star] = sampleposterior(this, x_star)
+        function [f_star] = sampleposterior(this, x_star, seed)
         % Sample from the posterior distribution at test points passed as an arguments
         % [f_star] = Regressor.sampleposterior(x_star)
+        % [f_star] = Regressor.sampleposterior(x_star, seed)
         % Inputs : x_star (test points)
+        %        : seed (optional) for repeatable draws.
         % Outputs : f_star (a sample from the posterior distribution)
         
             this.check();
@@ -298,8 +307,11 @@ classdef Regressor < tacopig.gp.GpCore
                 pause
             end
             [mu_star var_star var_full] = this.query(x_star);
-            LFull  = chol(var_full+diag(var_star)*1e-4, 'lower');
-            f_star = randn(1,nx)*LFull' +mu_star;
+            LFull  = chol(var_full+diag(1+ diag(var_full))*1e-4, 'lower');
+            if (nargin==3)
+                randn('seed', seed);
+            end
+            f_star = randn(1,nx)*LFull' + mu_star;
         end
         
         function [objective, objective_grad] = objectfun(this, parvec)

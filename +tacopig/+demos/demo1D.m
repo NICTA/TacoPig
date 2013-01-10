@@ -121,7 +121,7 @@ plot(X, y, 'k+', 'MarkerSize', 17)
 xstar = linspace(-8,8,100);
 hold on;
 for i = 1:5
-    fstar = GP.sampleposterior(xstar);
+    fstar = GP.sampleposterior(xstar, 50+i);
     plot(xstar,fstar, 'color', rand(1,3));
 end
 title('Samples from Posterior')

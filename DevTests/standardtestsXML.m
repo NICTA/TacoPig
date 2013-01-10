@@ -63,9 +63,14 @@
 clear all
 clear functions
 clc
+
+
+% sets up the report and everything
+Test_Regressor
+
 testpath = '../+tacopig'; % Relative path of main library to here
 interactive = false; % Do we prompt on regression test failures?
-report = JenkinsReport('Tacopig');
+%report = JenkinsReport('Tacopig');
 
 
 
@@ -976,3 +981,7 @@ catch e
     fprintf('Could not save regression test values... try saving manually!');
 end
 
+
+fprintf('End of test..\n\n\nFinal report:\n\n');
+
+fprintf(report.print)
