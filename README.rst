@@ -70,21 +70,22 @@ We welcome contributions to TacoPig in the form of GitHub pull requests. Before
 you create a pull request, please ensure you have included the following:
 
 1. Descriptive commit messages
-
-   Describe what functionality you have added. If you have fixed a bug,
-   refer to the issue number using a hash: e.g. "fixed #453". The standard
-   format for a commit message is a short one-line description of the commit,
-   then a blank line, then a more detailed paragraph if necessary.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Describe what functionality you have added. If you have fixed a bug,
+ refer to the issue number using a hash: e.g. "fixed #453". The standard
+ format for a commit message is a short one-line description of the commit,
+ then a blank line, then a more detailed paragraph if necessary.
 
 2. Documentation
-
-   *insert paragraph on documentation here*
+~~~~~~~~~~~~~~~~
+*insert paragraph on documentation here*
 
 3. Test cases
-   
-   *insert paragraph on test cases here*
+~~~~~~~~~~~~~
+*insert paragraph on test cases here*
 
-3. Your name as a contributor in the AUTHORS file
+4. Your name as a contributor in the AUTHORS file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 Contact
