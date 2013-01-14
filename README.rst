@@ -51,8 +51,40 @@ To view the code documentation, type:
 
 into the MATLAB command line after you have added the toolbox to MATLAB's path.
 
+
 Contributing to TacoPig
 =======================
+
+Bugs
+----
+
+Please submit bug reports using the GitHub Issues feature. Be sure to first check
+that the bug exists in the latest release, as it may have been fixed since you last
+downloaded TacoPig. We strongly encourage you to include code to reproduce the
+error if possible.
+
+Contributing Code
+-----------------
+
+We welcome contributions to TacoPig in the form of GitHub pull requests. Before
+you create a pull request, please ensure you have included the following:
+
+1. Descriptive commit messages
+
+   Describe what functionality you have added. If you have fixed a bug,
+   refer to the issue number using a hash: e.g. "fixed #453". The standard
+   format for a commit message is a short one-line description of the commit,
+   then a blank line, then a more detailed paragraph if necessary.
+
+2. Documentation
+
+   *insert paragraph on documentation here*
+
+3. Test cases
+   
+   *insert paragraph on test cases here*
+
+3. Your name as a contributor in the AUTHORS file
 
 
 Contact
