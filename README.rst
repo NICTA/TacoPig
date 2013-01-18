@@ -11,7 +11,7 @@ tacopig/TacoPigStructure.png illustrates the structure of the Gaussian process
 model used by TacoPig. 
 
 
-.. image:: TacoPigStructure.png
+.. image:: ./TacoPigStructure.png
 
 At the model's centre is a Gaussian process class instance which contains the
 key functions for inference and learning as well as the properties such as the
