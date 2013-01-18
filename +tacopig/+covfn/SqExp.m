@@ -1,4 +1,10 @@
 % The Squared Exponential covariance function class
+%
+% Example Instantiation:
+% GP.CovFn = tacopig.covfn.SqExp();
+% Creates an instance of the squared exponential covariance function as the CovFn 
+% property of an instantiation of a Gaussian process class named GP.
+%
 % k(X1,X2) = Sigma_f^2*exp(-0.5*(X1-X2)'*diag(Lengthscales.^-2)*(X1-X2))
 %
 % X1 and X2 are input matrices of dimensionality D x N and D x M, respectively. 

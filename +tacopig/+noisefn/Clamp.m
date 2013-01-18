@@ -1,4 +1,12 @@
-% Allows a clamp hyperparameters in the noise func
+% Clamps specific parameters of a noise function
+% These parameters are not altered during the learning phase.
+% Usage:tacopig.noisefn.Clamp(noisefn,indx,value);
+% 
+% Example instantiation:
+% GP.NoiseFn   = tacopig.noisefn.Clamp(tacopig.noisefn.LogStationary(),[1],[1.2]);
+% Instantiates the Log Stationary function (a property of a Gaussian process instantiation called GP) 
+% with its first parameter clamped to the value 1.2.
+
 classdef Clamp < tacopig.noisefn.NoiseFunc
     
     properties

@@ -1,4 +1,10 @@
 % The Exponential covariance function class
+%
+% Example instantiation:
+% GP.CovFn   = tacopig.covfn.Exp();
+% Instantiates an Exponential covariance function (as a property of a Gaussian process instantiation called GP)
+%
+%
 % k(X1,X2) = Sigma_f^2*exp(-sqrt((X1-X2)'*diag(Lengthscales.^-2)*(X1-X2)))
 %
 % X1 and X2 are input matrices of dimensionality D x N and D x M, respectively. 

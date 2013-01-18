@@ -1,6 +1,13 @@
 % A special case of the Matern covariance function class with \nu set to 3/2 
+%
+% Example instantiation:
+% GP.CovFn   = tacopig.covfn.Mat3();
+% Instantiates a Matern3 covariance function (as a property of a Gaussian process instantiation called GP)
+%
+%
 % k(X1,X2) = Sigma_f^2*(1+sqrt(3*Tau'*diag(Lengthscales.^-2)*Tau))
 % *exp(-3*Tau'*diag(Lengthscales.^-2)*Tau);
+%
 % where Tau = X1-X2;
 % X1 and X2 are input matrices of dimensionality D x N and D x M, respectively. 
 % D is the dimesionality of the data. 

@@ -1,6 +1,13 @@
-% tacopig.covfn.Product(child1, child2, ...)
 % Defines a covariance function product of the children.
 % All children must inherit tacopig.covfn.CovFn
+%
+% Usage: tacopig.covfn.Product(child1, child2, ...)
+%
+% Example instantiation:
+% GP.CovFn   = tacopig.covfn.Product(tacopig.covfn.SqExp(),tacopig.covfn.Mat3());
+% Instantiates a Product covariance function (as a property of a Gaussian process instantiation called GP) 
+% that is the product of a squared exponential and Matern3 covariance functions
+
 
 classdef Product < tacopig.covfn.CovFunc
     

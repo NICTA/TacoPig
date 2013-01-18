@@ -1,4 +1,5 @@
 % Covariance Function Abstract Class
+% All noise function classes must inherent from this class.
 
 classdef CovFunc < tacopig.taco
     

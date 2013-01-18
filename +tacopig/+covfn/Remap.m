@@ -1,6 +1,14 @@
 % Allows a re-ordering or repetition of hyperparameters
-% usage: Remap(covfn, index)
-% Eg. [1 1 2] would map optimisation vector [a b] into hyper vector [a a b]
+% Usage: Remap(covfn, index)
+% Eg. index = [1 1 2] would map optimisation vector [a b] into hyperparameter vector [a a b]
+%
+% Example instantiation
+% GP.CovFn   = tacopig.covfn.Remap(tacopig.covfn.SqExp(),[1 1 2]);
+% Instantiates a Remap of a Squared Exponential covariance function(as a property of a Gaussian process instantiation called GP) 
+% In this case, the first and second hyperparameters are remapped to the
+% one parameter so they will always be indentical (making it an isotropic covariance
+% function). The third hyperparameter is independent. 
+ 
 
 classdef Remap < tacopig.covfn.CovFunc
 

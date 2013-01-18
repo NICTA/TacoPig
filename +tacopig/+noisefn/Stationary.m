@@ -1,7 +1,15 @@
+
+   % The value of the noise is a constant and learnt during training.
+   %
+   % Example instantiation:
+   % GP.NoiseFn = tacopig.noisefn.Stationary()
+   % 
+   % Creates an instance of the Stationary noise function class as the
+   % NoiseFn property of a Gaussian process class named GP.
+   
 classdef Stationary < tacopig.noisefn.NoiseFunc
    
-    % Most noise functions will be static
-    % The value of the noise is constant and learnt during training.
+ 
 
     methods(Static) 
         

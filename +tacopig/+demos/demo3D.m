@@ -37,7 +37,7 @@ GP.X = X;
 GP.y = y;
 
 % Plug in the components
-GP.MeanFn  = tacopig.meanfn.ConstantMean(0);
+GP.MeanFn  = tacopig.meanfn.FixedMean(0);
 GP.CovFn   = tacopig.covfn.SqExp();%SqExp();
 GP.NoiseFn = tacopig.noisefn.Stationary();
 GP.objective_function = @tacopig.objectivefn.NLML;

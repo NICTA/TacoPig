@@ -29,7 +29,7 @@
 
 <listitem>
 <label>Product Page (Web)</label>
-<callback>web http://www.tacopig.org -browser;</callback>
+<callback>web https://github.com/NICTA/TacoPig -browser;</callback>
 <icon>$toolbox/matlab/icons/webicon.gif</icon>
 </listitem>
 

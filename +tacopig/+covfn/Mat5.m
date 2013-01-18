@@ -1,4 +1,10 @@
 % A special case of the Matern covariance function class with \nu set to 5/2 
+%
+% Example instantiation:
+% GP.CovFn   = tacopig.covfn.Mat5();
+% Instantiates a Matern5 covariance function as a property of a Gaussian process instantiation called GP
+%
+%
 % k(X1,X2) = Sigma_f^2*(1+sqrt(5*Tau'*diag(Lengthscales.^-2)*Tau)+(5/3)*Tau'*diag(Lengthscales.^-2)*Tau)
 % *exp(-5*Tau'*diag(Lengthscales.^-2)*Tau);
 % where Tau = X1-X2;

@@ -17,7 +17,7 @@
 %   tacopig.gp.Regressor            - Gaussian process regression equations
 %   
 %  Mean Functions:
-%   tacopig.meanfn.ConstantMean     - A constant value is used for the GP's mean
+%   tacopig.meanfn.FixedMean     - A constant value is used for the GP's mean
 %   tacopig.meanfn.MeanFunc         - Mean function abstract class
 %   tacopig.meanfn.StationaryMean   - A constant global mean value that is learnt during the hyperparameter training phase
 %

@@ -1,6 +1,14 @@
 % Defines a covariance function sum of the children.
 % tacopig.covfn.Sum(child1, child2, ...)
+%
 % All children must inherit tacopig.covfn.CovFn
+%
+% Example instantiation:
+% GP.CovFn   = tacopig.covfn.Sum(tacopig.covfn.SqExp(),tacopig.covfn.Mat3());
+% Instantiates a Sum covariance function (as a property of a Gaussian process instantiation called GP) 
+% that is the summation of a squared exponential and Matern3 covariance functions
+
+
 
 classdef Sum < tacopig.covfn.CovFunc
     

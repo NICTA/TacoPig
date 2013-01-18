@@ -1,4 +1,16 @@
-% The parameter that is passed to the noise function is the log of the true noise
+   % The value of the noise is a constant and learnt during training.
+   %
+   % Example instantiation:
+   % GP.NoiseFn = tacopig.noisefn.LogStationary()
+   % 
+   % Creates an instance of the Stationary noise function class as the
+   % NoiseFn property of a Gaussian process class named GP.
+   %
+   % The parameter that is passed to the noise function is the log of the
+   % true noise. This feature can be useful in helping the optimiser
+   % choosing an appropriate step-size and ensures that negative values in the search space
+   % are not simply a repetitions of the positive values due to the squaring of the noise. 
+   % 
 classdef LogStationary < tacopig.noisefn.NoiseFunc
    
     methods(Static) 

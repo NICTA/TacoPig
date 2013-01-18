@@ -1,5 +1,12 @@
-% Clamps specific parameters of a covariance function so that they are not
-% altered during the learning phase.
+% Clamps specific parameters of a covariance function
+% These parameters are not altered during the learning phase.
+% Usage: tacopig.covfn.Clamp(covfn,indx,value);
+% 
+% Example instantiation:
+% GP.CovFn   = tacopig.covfn.Clamp(tacopig.covfn.SqExp(),[1 3],[4 0.6]);
+% Instantiates a Squared exponential covariance function (as a property of a Gaussian process instantiation called GP) 
+% with its first and third hyperparameters clamped to the value 4 and 0.6, respectively.
+
 
 classdef Clamp < tacopig.covfn.CovFunc
     

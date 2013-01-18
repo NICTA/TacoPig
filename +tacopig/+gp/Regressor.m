@@ -1,5 +1,8 @@
 % Standard GP-regression model
-
+%
+% Example instantiation
+% GP = tacopig.gp.Regressor;
+% This creates a instance of a Gaussian process regressor called GP.
 classdef Regressor < tacopig.gp.GpCore
     
     properties
