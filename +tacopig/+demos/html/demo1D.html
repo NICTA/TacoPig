@@ -1,0 +1,270 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demo1D</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-11-30"><meta name="DC.source" content="demo1D.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</a></li><li><a href="#3">Set up 1-D Data</a></li><li><a href="#4">Set up Gaussian process</a></li><li><a href="#5">Before Learning: Query</a></li><li><a href="#6">Learn &amp; Query</a></li><li><a href="#7">Generate samples from prior and posterior</a></li></ul></div><pre class="codeinput"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">%                       Gaussian Process Demo Script</span>
+<span class="comment">%  Demonstrates GP regression using the taco-pig toolbox on 1-D Data.</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+<span class="comment">%Add optimization folder</span>
+<span class="comment">% p = pwd(); slash = p(1);</span>
+<span class="comment">% addpath(genpath(['..',slash,'optimization']))</span>
+addpath(genpath([<span class="string">'optimization'</span>]))
+</pre><h2>%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<a name="2"></a></h2><pre class="codeinput">close <span class="string">all</span>; clear <span class="string">all</span>; clear <span class="string">functions</span>; clc;
+<span class="comment">% import tacopig.*;</span>
+</pre><h2>Set up 1-D Data<a name="3"></a></h2><p>Training Data Rasmussen &amp; Williams "Gaussian Processes for Machine Learning", Fig. 2.5</p><pre class="codeinput">X = [-2.1775,-0.9235,0.7502,-5.8868,-2.7995,4.2504,2.4582,6.1426,<span class="keyword">...</span>
+    -4.0911,-6.3481,1.0004,-4.7591,0.4715,4.8933,4.3248,-3.7461,<span class="keyword">...</span>
+    -7.3005,5.8177,2.3851,-6.3772];
+y = [1.4121,1.6936,-0.7444,0.2493,0.3978,-1.2755,-2.221,-0.8452,<span class="keyword">...</span>
+    -1.2232,0.0105,-1.0258,-0.8207,-0.1462,-1.5637,-1.098,-1.1721,<span class="keyword">...</span>
+    -1.7554,-1.0712,-2.6937,-0.0329];
+xstar = linspace(-8, 8, 201);
+
+<span class="comment">% Order data points for visualisation</span>
+[X id] = sort(X);
+y = y(id);
+</pre><h2>Set up Gaussian process<a name="4"></a></h2><pre class="codeinput"><span class="comment">% Use a standard GP regression model:</span>
+GP = tacopig.gp.Regressor;
+
+<span class="comment">% Plug in the data</span>
+GP.X = X;
+GP.y = y;
+
+<span class="comment">% Plug in the components</span>
+GP.MeanFn  = tacopig.meanfn.ConstantMean(mean(y));
+<span class="comment">% GP.CovFn   = tacopig.covfn.Sum(tacopig.covfn.Mat3(),tacopig.covfn.SqExp());%SqExp();</span>
+GP.CovFn   = tacopig.covfn.SqExp();
+GP.NoiseFn = tacopig.noisefn.Stationary();
+GP.objective_function = @tacopig.objectivefn.NLML;
+GP.solver_function = @anneal;
+
+<span class="comment">% Initialise the hyperparameters</span>
+GP.covpar   = 0.5*ones(1,GP.CovFn.npar(size(X,1)));
+GP.meanpar  = zeros(1,GP.MeanFn.npar(size(X,1)));
+GP.noisepar = 1e-3*ones(1,GP.NoiseFn.npar);
+</pre><h2>Before Learning: Query<a name="5"></a></h2><pre class="codeinput">GP.solve();
+[mf, vf] = GP.query(xstar);
+sf  = sqrt(vf);
+
+<span class="comment">% Display predicitve mean and variance</span>
+figure
+plot(X, y, <span class="string">'k+'</span>, <span class="string">'MarkerSize'</span>, 17)
+f  = [mf+2*sf,flipdim(mf-2*sf,2)]';
+h(1) = fill([xstar, flipdim(xstar,2)], f, [6 6 6]/8, <span class="string">'EdgeColor'</span>, [6 6 6]/8);
+hold <span class="string">on</span>
+h(2) = plot(xstar,mf,<span class="string">'k-'</span>,<span class="string">'LineWidth'</span>,2);
+h(3) = plot(X, y, <span class="string">'k+'</span>, <span class="string">'MarkerSize'</span>, 17);
+title(<span class="string">'Not learnt'</span>);
+legend(h,<span class="string">'Predictive Standard Deviation'</span>,<span class="string">'Predictive Mean'</span>, <span class="string">'Training Points'</span>)
+</pre><img vspace="5" hspace="5" src="demo1D_01.png" alt=""> <h2>Learn &amp; Query<a name="6"></a></h2><pre class="codeinput">disp(<span class="string">'Press any key to begin learning.'</span>)
+pause
+GP.learn();
+GP.solve();
+[mf, vf] = GP.query(xstar);
+sf  = sqrt(vf);
+
+<span class="comment">% Display learnt model</span>
+figure
+plot(X, y, <span class="string">'k+'</span>, <span class="string">'MarkerSize'</span>, 17)
+f  = [mf+2*(sf),flipdim(mf-2*(sf),2)]';
+h(1) = fill([xstar, flipdim(xstar,2)], f, [6 6 6]/8, <span class="string">'EdgeColor'</span>, [6 6 6]/8);
+hold <span class="string">on</span>
+h(2) = plot(xstar,mf,<span class="string">'k-'</span>,<span class="string">'LineWidth'</span>,2);
+h(3) = plot(X, y, <span class="string">'k+'</span>, <span class="string">'MarkerSize'</span>, 17);
+title(<span class="string">'Learnt'</span>);
+legend(h,<span class="string">'Predictive Standard Deviation'</span>,<span class="string">'Predictive Mean'</span>, <span class="string">'Training Points'</span>)
+pause
+</pre><pre class="codeoutput">Press any key to begin learning.
+Running simulated annealing. Does not use gradients.
+
+  Initial temperature:     	1
+  Final temperature:       	4.01735e-07
+  Consecutive rejections:  	1128
+  Number of function calls:	7979
+  Total final loss:        	14.9551
+</pre><img vspace="5" hspace="5" src="demo1D_02.png" alt=""> <h2>Generate samples from prior and posterior<a name="7"></a></h2><pre class="codeinput">figure; subplot(1,2,1)
+xstar = linspace(-8,8,100);
+hold <span class="string">on</span>;
+<span class="keyword">for</span> i = 1:5
+    fstar = GP.sampleprior(xstar);
+    plot(xstar,fstar, <span class="string">'color'</span>, rand(1,3));
+<span class="keyword">end</span>
+title(<span class="string">'Samples from Prior'</span>)
+
+subplot(1,2,2)
+plot(X, y, <span class="string">'k+'</span>, <span class="string">'MarkerSize'</span>, 17)
+xstar = linspace(-8,8,100);
+hold <span class="string">on</span>;
+<span class="keyword">for</span> i = 1:5
+    fstar = GP.sampleposterior(xstar);
+    plot(xstar,fstar, <span class="string">'color'</span>, rand(1,3));
+<span class="keyword">end</span>
+title(<span class="string">'Samples from Posterior'</span>)
+</pre><img vspace="5" hspace="5" src="demo1D_03.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                       Gaussian Process Demo Script
+%  Demonstrates GP regression using the taco-pig toolbox on 1-D Data.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Add optimization folder
+% p = pwd(); slash = p(1);
+% addpath(genpath(['..',slash,'optimization']))
+addpath(genpath(['optimization']))
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+close all; clear all; clear functions; clc;
+% import tacopig.*;
+
+%% Set up 1-D Data
+% Training Data
+% Rasmussen & Williams "Gaussian Processes for Machine Learning", Fig. 2.5
+X = [-2.1775,-0.9235,0.7502,-5.8868,-2.7995,4.2504,2.4582,6.1426,...
+    -4.0911,-6.3481,1.0004,-4.7591,0.4715,4.8933,4.3248,-3.7461,...
+    -7.3005,5.8177,2.3851,-6.3772];
+y = [1.4121,1.6936,-0.7444,0.2493,0.3978,-1.2755,-2.221,-0.8452,...
+    -1.2232,0.0105,-1.0258,-0.8207,-0.1462,-1.5637,-1.098,-1.1721,...
+    -1.7554,-1.0712,-2.6937,-0.0329];
+xstar = linspace(-8, 8, 201); 
+
+% Order data points for visualisation
+[X id] = sort(X);
+y = y(id);
+
+%% Set up Gaussian process
+
+% Use a standard GP regression model:
+GP = tacopig.gp.Regressor;
+
+% Plug in the data
+GP.X = X;
+GP.y = y;
+
+% Plug in the components
+GP.MeanFn  = tacopig.meanfn.ConstantMean(mean(y));
+% GP.CovFn   = tacopig.covfn.Sum(tacopig.covfn.Mat3(),tacopig.covfn.SqExp());%SqExp();
+GP.CovFn   = tacopig.covfn.SqExp();
+GP.NoiseFn = tacopig.noisefn.Stationary();
+GP.objective_function = @tacopig.objectivefn.NLML;
+GP.solver_function = @anneal;
+
+% Initialise the hyperparameters
+GP.covpar   = 0.5*ones(1,GP.CovFn.npar(size(X,1)));
+GP.meanpar  = zeros(1,GP.MeanFn.npar(size(X,1)));
+GP.noisepar = 1e-3*ones(1,GP.NoiseFn.npar);
+
+
+%% Before Learning: Query
+GP.solve(); 
+[mf, vf] = GP.query(xstar);
+sf  = sqrt(vf);
+
+% Display predicitve mean and variance
+figure
+plot(X, y, 'k+', 'MarkerSize', 17)
+f  = [mf+2*sf,flipdim(mf-2*sf,2)]';
+h(1) = fill([xstar, flipdim(xstar,2)], f, [6 6 6]/8, 'EdgeColor', [6 6 6]/8);
+hold on
+h(2) = plot(xstar,mf,'k-','LineWidth',2);
+h(3) = plot(X, y, 'k+', 'MarkerSize', 17);
+title('Not learnt');
+legend(h,'Predictive Standard Deviation','Predictive Mean', 'Training Points')
+
+%% Learn & Query
+disp('Press any key to begin learning.')
+pause
+GP.learn();
+GP.solve();
+[mf, vf] = GP.query(xstar);
+sf  = sqrt(vf);
+
+% Display learnt model
+figure
+plot(X, y, 'k+', 'MarkerSize', 17)
+f  = [mf+2*(sf),flipdim(mf-2*(sf),2)]';
+h(1) = fill([xstar, flipdim(xstar,2)], f, [6 6 6]/8, 'EdgeColor', [6 6 6]/8);
+hold on
+h(2) = plot(xstar,mf,'k-','LineWidth',2);
+h(3) = plot(X, y, 'k+', 'MarkerSize', 17);
+title('Learnt');
+legend(h,'Predictive Standard Deviation','Predictive Mean', 'Training Points')
+pause
+
+%% Generate samples from prior and posterior
+figure; subplot(1,2,1)
+xstar = linspace(-8,8,100);
+hold on;
+for i = 1:5
+    fstar = GP.sampleprior(xstar);
+    plot(xstar,fstar, 'color', rand(1,3));
+end
+title('Samples from Prior')
+
+subplot(1,2,2)
+plot(X, y, 'k+', 'MarkerSize', 17)
+xstar = linspace(-8,8,100);
+hold on;
+for i = 1:5
+    fstar = GP.sampleposterior(xstar);
+    plot(xstar,fstar, 'color', rand(1,3));
+end
+title('Samples from Posterior')
+
+
+##### SOURCE END #####
+--></body></html>

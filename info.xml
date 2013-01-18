@@ -1,0 +1,43 @@
+
+<productinfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="optional">
+    <?xml-stylesheet type="text/xsl"href="optional"?>
+     
+    <matlabrelease>2012a</matlabrelease>
+    <name>TacoPig</name>
+    <type>toolbox</type>
+    <icon>+tacopig/+demos/html/tinypig.png</icon>
+    <help_location>+tacopig/+demos/html</help_location>
+    <help_contents_icon>$toolbox/matlab/icons/bookicon.gif</help_contents_icon>
+
+<list>
+
+<listitem>
+<label>Help</label>
+<callback>doc tacopig</callback>
+<icon>$toolbox/matlab/icons/book_mat.gif</icon>
+</listitem>
+
+
+<listitem>
+<label>Demos</label>
+<callback>demo toolbox tacopig</callback>
+<icon>$toolbox/matlab/icons/demoicon.gif</icon>
+</listitem>
+
+
+
+<listitem>
+<label>Product Page (Web)</label>
+<callback>web https://github.com/NICTA/TacoPig -browser;</callback>
+<icon>$toolbox/matlab/icons/webicon.gif</icon>
+</listitem>
+
+
+
+</list>
+
+
+
+</productinfo>
+

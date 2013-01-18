@@ -1,0 +1,284 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demo3D</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-12-14"><meta name="DC.source" content="demo3D.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 3-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</a></li><li><a href="#3">Set up 3-D Data</a></li><li><a href="#4">Set up Gaussian process</a></li><li><a href="#5">Learn &amp; Query</a></li><li><a href="#6">Visualise GP Outputs</a></li></ul></div><pre class="codeinput"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">%                       Gaussian Process Demo Script</span>
+<span class="comment">%  Demonstrates GP regression using the taco-pig toolbox on 3-D Data.</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+<span class="comment">%Add optimization folder</span>
+<span class="comment">% p = pwd(); slash = p(1);</span>
+<span class="comment">% addpath(genpath(['..',slash,'optimization']))</span>
+addpath(genpath([<span class="string">'optimization'</span>]))
+</pre><h2>%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 3-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<a name="2"></a></h2><pre class="codeinput">close <span class="string">all</span>; clear <span class="string">all</span>; clear <span class="string">functions</span>; clc;
+<span class="comment">% import tacopig.*;</span>
+</pre><h2>Set up 3-D Data<a name="3"></a></h2><p>Training Data</p><pre class="codeinput">groundtruth = @(x,y,z) 5*exp(-(((x).^2)/5+((1-y).^2)/2+((0.5-z).^2)/3))<span class="keyword">...</span>
+    -4*exp(-(((2-x).^2)/2+((-1-y).^2)/5+((-1.5-z).^2)/2));
+X = (rand(3,50)-0.5)*6;
+y = groundtruth(X(1,:),X(2,:),X(3,:))+1e-2*randn(1,size(X,2));
+
+[xeva yeva zeva] = meshgrid(-3:0.5:3,-3:0.5:3,-3:0.2:3);
+xstar = [xeva(:)';yeva(:)';zeva(:)'];
+
+figure; scatter3(X(1,:),X(2,:),X(3,:),40,y,<span class="string">'filled'</span>)
+xlabel(<span class="string">'x'</span>);ylabel(<span class="string">'y'</span>);zlabel(<span class="string">'z'</span>); title(<span class="string">'Training Data'</span>)
+
+pause
+</pre><img vspace="5" hspace="5" src="demo3D_01.png" alt=""> <h2>Set up Gaussian process<a name="4"></a></h2><pre class="codeinput"><span class="comment">% Use a standard GP regression model:</span>
+GP = tacopig.gp.Regressor;
+
+<span class="comment">% Plug in the data</span>
+GP.X = X;
+GP.y = y;
+
+<span class="comment">% Plug in the components</span>
+GP.MeanFn  = tacopig.meanfn.ConstantMean(0);
+GP.CovFn   = tacopig.covfn.SqExp();<span class="comment">%SqExp();</span>
+GP.NoiseFn = tacopig.noisefn.Stationary();
+GP.objective_function = @tacopig.objectivefn.NLML;
+GP.solver_function = @anneal;
+
+<span class="comment">% Initialise the hyperparameters</span>
+GP.covpar   = 1*ones(1,GP.CovFn.npar(size(X,1)));
+GP.meanpar  = zeros(1,GP.MeanFn.npar(size(X,1)));
+GP.noisepar = 1e-3*ones(1,GP.NoiseFn.npar);
+</pre><h2>Learn &amp; Query<a name="5"></a></h2><pre class="codeinput">GP.learn();
+GP.solve();
+[mf, vf] = GP.query(xstar);
+sf  = sqrt(vf);
+</pre><pre class="codeoutput">Running simulated annealing. Does not use gradients.
+
+  Initial temperature:     	1
+  Final temperature:       	3.21388e-07
+  Consecutive rejections:  	1278
+  Number of function calls:	8906
+  Total final loss:        	39.027
+</pre><h2>Visualise GP Outputs<a name="6"></a></h2><pre class="codeinput"><span class="comment">% Build a colormap</span>
+cmap = jet(5);
+levels = linspace(-2.5,3.5,5);
+
+<span class="comment">% Generate isosurfaces</span>
+figure;
+<span class="keyword">for</span> ii = 1:5
+    camlight
+    lighting <span class="string">gouraud</span>
+    hh(ii) = patch(isosurface(xeva, yeva, zeva, reshape(mf,size(xeva)), levels(ii)));
+    set(hh(ii), <span class="string">'Facecolor'</span>, cmap(ii,:), <span class="string">'Edgecolor'</span>, <span class="string">'none'</span>, <span class="string">'facealpha'</span>, (1-(5-abs(levels(ii)))/5));
+    axis([-3 3 -3 3 -3 3])
+    caxis([-4,5]);
+    xlabel(<span class="string">'x'</span>);ylabel(<span class="string">'y'</span>);zlabel(<span class="string">'z'</span>)
+    colorbar
+<span class="keyword">end</span>
+ title(<span class="string">'Predictive Mean'</span>)
+
+
+figure;
+<span class="keyword">for</span> i = 1:5
+    fstar = GP.sampleprior(xstar);
+    clf
+    <span class="keyword">for</span> ii = 1:5
+        camlight
+        lighting <span class="string">gouraud</span>
+        hh(ii) = patch(isosurface(xeva, yeva, zeva, reshape(fstar,size(xeva)), levels(ii)));
+        set(hh(ii), <span class="string">'Facecolor'</span>, cmap(ii,:), <span class="string">'Edgecolor'</span>, <span class="string">'none'</span>, <span class="string">'facealpha'</span>, (1-(5-abs(levels(ii)))/5));
+        axis([-3 3 -3 3 -3 3])
+        caxis([-4,5]);
+        xlabel(<span class="string">'x'</span>);ylabel(<span class="string">'y'</span>);zlabel(<span class="string">'z'</span>)
+        colorbar
+    <span class="keyword">end</span>
+    title(<span class="string">'Prior Samples'</span>)
+    pause(0.5)
+<span class="keyword">end</span>
+
+
+
+ figure;
+<span class="keyword">for</span> i = 1:5
+    fstar = GP.sampleposterior(xstar);
+    clf
+    <span class="keyword">for</span> ii = 1:5
+        camlight
+        lighting <span class="string">gouraud</span>
+        hh(ii) = patch(isosurface(xeva, yeva, zeva, reshape(fstar,size(xeva)), levels(ii)));
+        set(hh(ii), <span class="string">'Facecolor'</span>, cmap(ii,:), <span class="string">'Edgecolor'</span>, <span class="string">'none'</span>, <span class="string">'facealpha'</span>, (1-(5-abs(levels(ii)))/5));
+        axis([-3 3 -3 3 -3 3])
+        caxis([-4,5]);
+        xlabel(<span class="string">'x'</span>);ylabel(<span class="string">'y'</span>);zlabel(<span class="string">'z'</span>)
+        colorbar
+    <span class="keyword">end</span>
+    title(<span class="string">'Posterior Sample'</span>)
+    pause(0.5)
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="demo3D_02.png" alt=""> <img vspace="5" hspace="5" src="demo3D_03.png" alt=""> <img vspace="5" hspace="5" src="demo3D_04.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                       Gaussian Process Demo Script
+%  Demonstrates GP regression using the taco-pig toolbox on 3-D Data.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Add optimization folder
+% p = pwd(); slash = p(1);
+% addpath(genpath(['..',slash,'optimization']))
+addpath(genpath(['optimization']))
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 3-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+close all; clear all; clear functions; clc;
+% import tacopig.*;
+
+%% Set up 3-D Data
+% Training Data
+groundtruth = @(x,y,z) 5*exp(-(((x).^2)/5+((1-y).^2)/2+((0.5-z).^2)/3))...
+    -4*exp(-(((2-x).^2)/2+((-1-y).^2)/5+((-1.5-z).^2)/2));
+X = (rand(3,50)-0.5)*6;
+y = groundtruth(X(1,:),X(2,:),X(3,:))+1e-2*randn(1,size(X,2));
+
+[xeva yeva zeva] = meshgrid(-3:0.5:3,-3:0.5:3,-3:0.2:3);
+xstar = [xeva(:)';yeva(:)';zeva(:)'];
+
+figure; scatter3(X(1,:),X(2,:),X(3,:),40,y,'filled')
+xlabel('x');ylabel('y');zlabel('z'); title('Training Data')
+
+pause
+%% Set up Gaussian process
+
+% Use a standard GP regression model:
+GP = tacopig.gp.Regressor;
+
+% Plug in the data
+GP.X = X;
+GP.y = y;
+
+% Plug in the components
+GP.MeanFn  = tacopig.meanfn.ConstantMean(0);
+GP.CovFn   = tacopig.covfn.SqExp();%SqExp();
+GP.NoiseFn = tacopig.noisefn.Stationary();
+GP.objective_function = @tacopig.objectivefn.NLML;
+GP.solver_function = @anneal;
+
+% Initialise the hyperparameters
+GP.covpar   = 1*ones(1,GP.CovFn.npar(size(X,1)));
+GP.meanpar  = zeros(1,GP.MeanFn.npar(size(X,1)));
+GP.noisepar = 1e-3*ones(1,GP.NoiseFn.npar);
+
+
+%% Learn & Query
+GP.learn();
+GP.solve();
+[mf, vf] = GP.query(xstar);
+sf  = sqrt(vf);
+
+%% Visualise GP Outputs
+
+% Build a colormap
+cmap = jet(5); 
+levels = linspace(-2.5,3.5,5);
+
+% Generate isosurfaces
+figure; 
+for ii = 1:5
+    camlight
+    lighting gouraud
+    hh(ii) = patch(isosurface(xeva, yeva, zeva, reshape(mf,size(xeva)), levels(ii)));
+    set(hh(ii), 'Facecolor', cmap(ii,:), 'Edgecolor', 'none', 'facealpha', (1-(5-abs(levels(ii)))/5));
+    axis([-3 3 -3 3 -3 3])
+    caxis([-4,5]);
+    xlabel('x');ylabel('y');zlabel('z')
+    colorbar
+end
+ title('Predictive Mean')
+
+
+figure;
+for i = 1:5
+    fstar = GP.sampleprior(xstar);
+    clf
+    for ii = 1:5
+        camlight
+        lighting gouraud
+        hh(ii) = patch(isosurface(xeva, yeva, zeva, reshape(fstar,size(xeva)), levels(ii)));
+        set(hh(ii), 'Facecolor', cmap(ii,:), 'Edgecolor', 'none', 'facealpha', (1-(5-abs(levels(ii)))/5));
+        axis([-3 3 -3 3 -3 3])
+        caxis([-4,5]);
+        xlabel('x');ylabel('y');zlabel('z')
+        colorbar
+    end
+    title('Prior Samples')
+    pause(0.5)
+end
+
+
+ 
+ figure;
+for i = 1:5
+    fstar = GP.sampleposterior(xstar);
+    clf
+    for ii = 1:5
+        camlight
+        lighting gouraud
+        hh(ii) = patch(isosurface(xeva, yeva, zeva, reshape(fstar,size(xeva)), levels(ii)));
+        set(hh(ii), 'Facecolor', cmap(ii,:), 'Edgecolor', 'none', 'facealpha', (1-(5-abs(levels(ii)))/5));
+        axis([-3 3 -3 3 -3 3])
+        caxis([-4,5]);
+        xlabel('x');ylabel('y');zlabel('z')
+        colorbar
+    end
+    title('Posterior Sample')
+    pause(0.5)
+end
+##### SOURCE END #####
+--></body></html>
