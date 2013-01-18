@@ -278,7 +278,7 @@ classdef Regressor < tacopig.gp.GpCore
             end
             Mu_0 = this.MeanFn.eval(x_star, this);
             kss  = this.CovFn.eval(x_star,x_star, this);
-            Lss  = chol(kss+diag(diag(kss))*1e-4, 'lower');
+            Lss  = chol(kss+diag(diag(kss))*1e-4, 'lower'); % small representative noise
             if (nargin==3)
                 randn('seed', seed);
             end
