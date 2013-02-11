@@ -10,8 +10,9 @@ if ~exist('minfunc')
     fprintf('Press any key to attempt to continue...\n');
     pause();
 end
-p = pwd(); slash = p(1);
-addpath(genpath(['..',slash,'optimization']))
+tacopigroot = which('tacopig.taco');
+tacopigroot = tacopigroot(1:end-15);
+addpath(genpath([tacopigroot,'optimization']))
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 

@@ -238,11 +238,9 @@ classdef Regressor < tacopig.gp.GpCore
             par0 = [this.meanpar, this.covpar, this.noisepar];
             [par,fval] = this.solver_function(@(theta) this.objectfun(theta), par0, this.opts);
              
-             % some of the optimizers transpose par...
-             if ((size(par,1) > 1)&(size(par,2) ==1))
-                % the optimizer transposed the parameters...
-                par = par';
-             end 
+            % some optimizers transpose par... flatten it ...
+            par = par(:)';
+             
              
              
             % Unpack the parameters again to save them:   
@@ -251,7 +249,9 @@ classdef Regressor < tacopig.gp.GpCore
             nmeanpar = this.MeanFn.npar(D);
             nnoisepar = this.NoiseFn.npar;
             this.meanpar = par(1:nmeanpar);
-            this.covpar = par(nmeanpar+(1:ncovpar));
+            
+            tmp = par(nmeanpar+(1:ncovpar));
+            this.covpar = tmp;
             this.noisepar = par(ncovpar+nmeanpar+(1:nnoisepar));
             this.lml = - tacopig.objectivefn.NLML(this,par);
             
@@ -328,9 +328,9 @@ classdef Regressor < tacopig.gp.GpCore
         %          objective_grad (the gradient of the objective function with respect to the parameters)
         
             if (nargout == 2)
-                [objective, objective_grad] = this.objective_function(this, parvec);
+                [objective, objective_grad] = this.objective_function(this, parvec(:)');
             elseif (nargout == 1)
-                 objective = this.objective_function(this, parvec);
+                 objective = this.objective_function(this, parvec(:)');
             else
                 error('Wrong number of output arguments');
             end

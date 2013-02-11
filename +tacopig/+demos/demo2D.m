@@ -6,12 +6,14 @@
 %Add optimization folder
 % p = pwd(); slash = p(1);
 % addpath(genpath(['..',slash,'optimization']))
-a = which('tacopig.taco');
-a = a(1:end-15);
-addpath(genpath([a,'optimization']))
+tacopigroot = which('tacopig.taco');
+tacopigroot = tacopigroot(1:end-15);
+addpath(genpath([tacopigroot,'optimization']))
+
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 close all; clear all; clear functions; clc;
+axx = [-3 3 -3 3 -8 8]; % standard viewing axis
 % import tacopig.*;
 
 %% Set up 2-D Data
@@ -23,6 +25,9 @@ y = peaks(X(1,:),X(2,:))+1e-2*randn(1,size(X,2));
 xstar = [xeva(:)';yeva(:)'];
 
 figure; scatter3(X(1,:),X(2,:),y,40,y,'filled')
+axis tight;
+set(gca, 'DataAspectRatioMode', 'manual','DataAspectRatio', [1 1 2]);
+axis(axx);
 xlabel('x');ylabel('y');zlabel('f(x,y)');title('Observations');
 
 %% Set up Gaussian process
@@ -39,7 +44,7 @@ GP.MeanFn  = tacopig.meanfn.StationaryMean();
 GP.CovFn   = tacopig.covfn.SqExp();%SqExp();
 GP.NoiseFn = tacopig.noisefn.Stationary();
 GP.objective_function = @tacopig.objectivefn.NLML;
-GP.solver_function = @anneal;
+%GP.solver_function = @anneal;
 
 % Initialise the hyperparameters
 GP.covpar   = 1*ones(1,GP.CovFn.npar(size(X,1)));
@@ -56,6 +61,10 @@ sf  = sqrt(vf);
 % Display learnt model
 figure
 scatter3(X(1,:),X(2,:),y,60,y,'filled')
+axis tight;
+set(gca, 'DataAspectRatioMode', 'manual','DataAspectRatio', [1 1 2]);
+axis(axx);
+
 hold on
 surf(xeva,yeva,reshape(mf,size(xeva)))
 title('Predictive Mean Function and Standard Deviation Surfaces');
@@ -73,6 +82,9 @@ for i = 1:5
     clf
     fstar = GP.sampleprior(xstar);
     surf(xeva,yeva,reshape(fstar,size(xeva)));
+    axis tight;
+    set(gca, 'DataAspectRatioMode', 'manual','DataAspectRatio', [1 1 2]);
+    axis(axx);
     title('Sample from Prior')
     pause(1)
 end
@@ -85,6 +97,9 @@ for i = 1:5
     clf
     fstar = GP.sampleposterior(xstar);
     surf(xeva,yeva,reshape(fstar,size(xeva)));
+    axis tight;
+    set(gca, 'DataAspectRatioMode', 'manual','DataAspectRatio', [1 1 2]);
+    axis(axx);
     title('Sample from Posterior')
     pause(1)
 end
