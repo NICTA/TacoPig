@@ -6,7 +6,9 @@
 %Add optimization folder
 % p = pwd(); slash = p(1);
 % addpath(genpath(['..',slash,'optimization']))
-addpath(genpath(['optimization']))
+a = which('tacopig.taco');
+a = a(1:end-15);
+addpath(genpath([a,'optimization']))
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 close all; clear all; clear functions; clc;

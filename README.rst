@@ -10,7 +10,6 @@ Model Structure
 tacopig/TacoPigStructure.png illustrates the structure of the Gaussian process
 model used by TacoPig. 
 
-
 .. image:: TacoPigStructure.png
 
 At the model's centre is a Gaussian process class instance which contains the
@@ -117,11 +116,25 @@ you create a pull request, please ensure you have included the following:
 2. Documentation
 ~~~~~~~~~~~~~~~~
  Comments should be integrate with the MATLAB doc and help commands. Use the 
-comments included in the MATLAB scripts of TacoPig v0.1 as templates.
+ comments included in the MATLAB scripts of TacoPig v0.1 as templates.
 
 3. Test cases
 ~~~~~~~~~~~~~
-*insert paragraph on test cases here*
+ The majority of TacoPig contributions will add covariance, mean or noise function objects 
+ to the code. A standard testing suite (tacopig.tests.standardtestsXML) is provided for testing 
+ these plugin objects, and will produce an XML report if a filename is provided as the first 
+ argument. standardtestsXML will automatically detect new plugin objects provided they are placed 
+ in the appropriate sub-package folders.
+ 
+ This standard test suite checks for common problems such as outputs that are the wrong size,
+ covariance functions that are not positive definite, or gradients that do not agree with 
+ numerical differentiation.
+ 
+ However, if you are contributing a plugin with non-standard functionality, or a new type of
+ GP core object, then it will be neccessary to provide explicit additional testing. Additional 
+ scripts should be placed in +tacopig/+tests.
+ 
+ 
 
 4. Your name as a contributor in the AUTHORS file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
