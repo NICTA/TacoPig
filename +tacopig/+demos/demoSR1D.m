@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                       Gaussian Process Demo Script
+%                     Gaussian Process Demo Script
 %  Demonstrates GP regression using the taco-pig toolbox on 1-D Data.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -14,11 +14,8 @@ tacopigroot = which('tacopig.taco');
 tacopigroot = tacopigroot(1:end-15);
 addpath(genpath([tacopigroot,'optimization']))
 
-
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%% %%%%%%%%%%%%%% 1-D Example of Subset of Regressors%%%%%%%%%%%%%%%%%%%%% 
 close all; clear functions; clc;
-rs = RandStream('mt19937ar','Seed',50); % make result repeatable
-% import tacopig.*;
 
 %% Set up 1-D Data
 % Training Data
@@ -36,16 +33,6 @@ y = y(id);
 
 xstar = linspace(-8, 8, 201); 
 [indxs, induced] = kmeans(X, 10); % only half as many points
-induced = [-7.3005
-   -6.2040
-   -4.1988
-   -2.4885
-   -0.9235
-    0.7407
-    2.3851
-    2.4582
-    4.4895
-    5.9802];
 % we will now compute the regression over these induced points
 
 
