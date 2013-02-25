@@ -16,7 +16,8 @@ addpath(genpath([tacopigroot,'optimization']))
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1-D Example%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-close all; clear all; clear functions; clc;
+close all; clear functions; clc;
+rs = RandStream('mt19937ar','Seed',50); % make result repeatable
 % import tacopig.*;
 
 %% Set up 1-D Data
@@ -29,19 +30,22 @@ y = [1.4121,1.6936,-0.7444,0.2493,0.3978,-1.2755,-2.221,-0.8452,...
     -1.2232,0.0105,-1.0258,-0.8207,-0.1462,-1.5637,-1.098,-1.1721,...
     -1.7554,-1.0712,-2.6937,-0.0329];
 
-% X = [-7.3005, -6.3772, -6.3481, -5.8868, -4.7591, -4.0911, -3.7461,...
-%     -2.7995, -2.1775, -0.9235, 0.7502, 1.0004, 2.3851, 2.4582,...
-%     4.2504, 4.3248, 4.8933, 5.8177, 6.1426];
-% 
-% y = [ -3.1593, -2.6634, -2.6364, -2.5123, -2.0282, -2.2231, -2.4161,...
-%     -2.1390, -1.5605, -1.4464, -0.4838, -0.2821, -1.4956,...
-%     -1.6061, -2.8353, -2.7971, -2.5217, -2.2265, -2.1399];
 n = size(X,2);
 [X id] = sort(X);
 y = y(id);
 
 xstar = linspace(-8, 8, 201); 
 [indxs, induced] = kmeans(X, 10); % only half as many points
+induced = [-7.3005
+   -6.2040
+   -4.1988
+   -2.4885
+   -0.9235
+    0.7407
+    2.3851
+    2.4582
+    4.4895
+    5.9802];
 % we will now compute the regression over these induced points
 
 
@@ -64,7 +68,7 @@ GP.objective_function = @tacopig.objectivefn.SR_LMLG;
 % GP.solver_function = @anneal;
 
 % Initialise the hyperparameters
-GP.covpar   = 0.5*ones(1,GP.CovFn.npar(size(X,1)));
+GP.covpar   = 2*ones(1,GP.CovFn.npar(size(X,1)));
 GP.meanpar  = zeros(1,GP.MeanFn.npar(size(X,1)));
 GP.noisepar = 0.4*ones(1,GP.NoiseFn.npar);
 

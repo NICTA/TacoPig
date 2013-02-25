@@ -96,8 +96,8 @@ classdef SubsetRegressor < tacopig.gp.GpCore
             eps = 1e-6*sum(diag(this.KI)); % or could use min etc
             this.KI  = this.KI + eps*eye(size(this.KI));
             
-            noise = this.NoiseFn.eval(this.XI, this);
-            this.Km  = (noise^2)*this.KI + this.KIX*this.KIX';
+            noise = this.NoiseFn.eval(1, this);
+            this.Km  = noise*this.KI + this.KIX*this.KIX';
             ym = (this.y - this.mu)';
             
             % Now we invert Km 
