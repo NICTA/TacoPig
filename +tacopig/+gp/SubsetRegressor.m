@@ -1,9 +1,13 @@
-% Standard GP-regression model
+% Subset of Regressors GP Model.
+% Based on section 8.3.1 of Rassmusen and Williams, Gaussian Processes for 
+% Machine Learning, 2006
 %
 % Example instantiation
-% GP = tacopig.gp.Regressor;
-% This creates a instance of a Gaussian process regressor called GP.
-classdef Regressor < tacopig.gp.GpCore
+% GP = tacopig.gp.SubsetRegressor;
+%
+% This creates a instance of a Gaussian process regressor that uses a subset of the whole data.
+
+classdef SubsetRegressor < tacopig.gp.GpCore
     
     properties
         mu                  % Evaluated Mean
@@ -22,16 +26,23 @@ classdef Regressor < tacopig.gp.GpCore
         has_been_solved     % Flag to stop premature querying of a model
         lml                 % log marginal likelihood of training data
         verbose             % Switch for friendly warnings & progress display
+        
+        XI                  % induced points of X to be used
+        KI                  % covariance matrix of induced points (K_mm)
+        KIX                 % covariance matrix metween induced points and whole datased (K_mn)
+        Km                  % 
+        palpha              % 
+
     end
     
    
     methods
  
         
-        function this = Regressor()
+        function this = SubsetRegressor()
         % Constructor - default settings
         %
-        % this = Regressor()
+        % this = SubsetRegressor()
         %
         % Defaults:
         %          factorisation = 'chol';
@@ -47,15 +58,15 @@ classdef Regressor < tacopig.gp.GpCore
         %              
              
              this.factorisation = 'chol';
-             this.objective_function = @tacopig.objectivefn.NLML;
+             this.objective_function = @tacopig.objectivefn.SR_LMLG;
              this.solver_function = @(fn, x0, opts) minFunc(fn, x0', opts); 
              this.has_been_solved = 0;
+             this.verbose = true;
              
              this.opts = [];
              this.opts.Method = 'lbfgs';
              this.opts.numDiff = 0;
              
-             this.verbose = true;
         end
                 
         
@@ -76,40 +87,42 @@ classdef Regressor < tacopig.gp.GpCore
             this.check(); 
             
             % Invoke the components
-            mu = this.MeanFn.eval(this.X, this);
-            K0 = this.CovFn.Keval(this.X, this);
+            this.mu = this.MeanFn.eval(this.X, this);
+            this.KI = this.CovFn.Keval(this.XI, this);
+            this.KIX = this.CovFn.eval(this.XI, this.X, this.covpar);
+            
+            % add a tiny noise to KI to keep positive definiteness
+            eps = 1e-6*sum(diag(this.KI)); % or could use min etc
+            this.KI  = this.KI + eps*eye(size(this.KI));
+            
             noise = this.NoiseFn.eval(this.X, this);
+            this.Km  = (noise^2)*this.KI + this.KIX*this.KIX';
+            ym = (this.y - this.mu)';
             
-            K = K0 + noise;
-            ym = (this.y - mu)';
-            
-            % We offer different factorisation methods
+            % Now we invert Km 
+            pseudoY = (this.KIX*ym);
             if strcmpi(this.factorisation, 'svd')
-                [U,S,V] = svd(K);
+                [U,S,V] = svd(this.Km);
                 S2 = diag(S);
                 S2(S2>0) = 1./S2(S2>0);
                 invK = V*diag(S2)*U';
-                this.alpha = invK*ym;
+                this.palpha = (invK*pseudoY); 
+                this.invK = invK;
                 this.factors.S2 = S2;
                 this.factors.SVD_U = U;
                 this.factors.SVD_S = S;
                 this.factors.SVD_V = V;
-                this.factors.type = 'svd';
             elseif strcmpi(this.factorisation, 'chol')
-                L = chol(K, 'lower');
-                this.alpha = L'\(L\ym);
-                this.K = K; 
+                L = chol(this.Km, 'lower');
+                % this.palpha = L'\(L\pseudoY);
+                this.invK = L'\(L\eye(size(this.Km)));
+                this.palpha = (this.invK*pseudoY); 
                 this.factors.L = L;
-                this.factors.type = 'chol';
-                this.mu = mu;
             else
-                error('tacopig:badConfiguration','Invalid factorisation method.');    
+                error('Invalid factorisation!');    
             end
             
-            % Save the solved outputs:
-            this.K = K; 
-            this.mu = mu;
-            this.lml = -tacopig.objectivefn.NLML(this, [this.meanpar, this.covpar, this.noisepar]);
+            this.lml = -tacopig.objectivefn.SR_LMLG(this, [this.meanpar, this.covpar, this.noisepar]);
             this.has_been_solved = 1;
         end
 
