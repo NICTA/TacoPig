@@ -30,8 +30,8 @@ classdef SubsetRegressor < tacopig.gp.GpCore
         XI                  % induced points of X to be used
         KI                  % covariance matrix of induced points (K_mm)
         KIX                 % covariance matrix metween induced points and whole datased (K_mn)
-        Km                  % 
-        palpha              % 
+        Km                  % Matrix to be inverted (K_mnKn_m + sigma_nKmm in book)
+        palpha              % Pseudo alpha (alpha_m in book)
 
     end
     
@@ -76,7 +76,7 @@ classdef SubsetRegressor < tacopig.gp.GpCore
         % e.g. The covariance matrix and its factorisation, the mean
         % function, the negativel log marginal likelihood value
         %
-        % function Regressor.solve()
+        % function SubsetRegressor.solve()
         % 
         %
         % Uses svd or cholesky decomposition (depending on value of the
@@ -130,7 +130,7 @@ classdef SubsetRegressor < tacopig.gp.GpCore
         function [mu_star, var_star, var_full] = query(this, x_star, NumBatches)
         % Query the model after it has been solved
         %
-        % [mu_star, var_star, var_full] = Regressor.query(x_star, batches)
+        % [mu_star, var_star, var_full] = SubsetRegressor.query(x_star, batches)
         %
         % Inputs:   x_star = test points
         %           NumBatches = the number of batches that the test points are broken up into. Default = 1
@@ -192,6 +192,7 @@ classdef SubsetRegressor < tacopig.gp.GpCore
             % we are currently handling the possibility of multi-task with
             % common points as a general case of GP_Std
             mu_0 = this.MeanFn.eval(x_star, this);
+            noise = this.NoiseFn.eval(this.X, this);
             
             partitions = round(linspace(1, nx+1, NumBatches+1));
             
@@ -207,30 +208,15 @@ classdef SubsetRegressor < tacopig.gp.GpCore
                     fprintf('%d to %d...\n',L, R);
                 end
                 
-                % Compute Predictive Mean
-                ks = this.CovFn.eval(this.X,x_star(:,LR),this)';
-                mu_star(LR) = mu_0(LR) + (ks*this.alpha)';
+                % Compute the predictive mean, using induced points
+                % k_m(x*) in book.
+                ks = this.CovFn.eval(this.XI,x_star(:,LR),this)';
+                %Compute the posterior mean using palpha.
+                mu_star(LR) = mu_0(LR) + (ks*this.palpha)';
 
                 if (nargout>=2)
-                    % Compute predictive variance
-                    var0 = this.CovFn.pointval(x_star(:,LR), this);
-                    if use_svd
-                        %S2 = S2(:,ones(1,size(x_star(:,LR),2)));
-                        v = bsxfun(@times, factorS, (ks*this.factors.SVD_U)');
-                    elseif use_chol
-                        v = this.factors.L\ks';
-                    else
-                        error('tacopig:badConfiguration', 'Factorization not implemented');
-                    end
-                    var_star(LR) = max(0,var0 - sum(v.*v));
-                    
-                    if (nargout ==3)
-                        % we also want the block
-                        % Can only get here if batches is set to 1
-                        
-                        var0 = this.CovFn.Keval(x_star(:,LR), this);
-                        var_full = var0-v'*v;
-                    end
+                    vs = (noise^2)*sum((ks.*(ks*this.invK))',1);
+                    var_star(LR) = max(0, vs + this.noisepar^2);
                 end
 
             end
@@ -266,7 +252,7 @@ classdef SubsetRegressor < tacopig.gp.GpCore
             tmp = par(nmeanpar+(1:ncovpar));
             this.covpar = tmp;
             this.noisepar = par(ncovpar+nmeanpar+(1:nnoisepar));
-            this.lml = - tacopig.objectivefn.NLML(this,par);
+            this.lml = - tacopig.objectivefn.SR_LMLG(this,par);
             
             % It hasnt been solved with the new parameters
             this.has_been_solved = false;
