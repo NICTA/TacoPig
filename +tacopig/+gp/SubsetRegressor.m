@@ -31,6 +31,7 @@ classdef SubsetRegressor < tacopig.gp.GpCore
         KI                  % covariance matrix of induced points (K_mm)
         KIX                 % covariance matrix metween induced points and whole datased (K_mn)
         Km                  % Matrix to be inverted (K_mnKn_m + sigma_nKmm in book)
+        invK                % Inverse of K_m
         palpha              % Pseudo alpha (alpha_m in book)
 
     end
@@ -65,7 +66,7 @@ classdef SubsetRegressor < tacopig.gp.GpCore
              
              this.opts = [];
              this.opts.Method = 'lbfgs';
-             this.opts.numDiff = 0;
+             this.opts.numDiff = 1; %Derivatives are calculated numerically
              
         end
                 
@@ -95,7 +96,7 @@ classdef SubsetRegressor < tacopig.gp.GpCore
             eps = 1e-6*sum(diag(this.KI)); % or could use min etc
             this.KI  = this.KI + eps*eye(size(this.KI));
             
-            noise = this.NoiseFn.eval(this.X, this);
+            noise = this.NoiseFn.eval(this.XI, this);
             this.Km  = (noise^2)*this.KI + this.KIX*this.KIX';
             ym = (this.y - this.mu)';
             
@@ -112,12 +113,14 @@ classdef SubsetRegressor < tacopig.gp.GpCore
                 this.factors.SVD_U = U;
                 this.factors.SVD_S = S;
                 this.factors.SVD_V = V;
+                this.factors.type = 'svd';
             elseif strcmpi(this.factorisation, 'chol')
                 L = chol(this.Km, 'lower');
                 % this.palpha = L'\(L\pseudoY);
                 this.invK = L'\(L\eye(size(this.Km)));
                 this.palpha = (this.invK*pseudoY); 
                 this.factors.L = L;
+                this.factors.type = 'chol';
             else
                 error('Invalid factorisation!');    
             end
@@ -148,7 +151,8 @@ classdef SubsetRegressor < tacopig.gp.GpCore
             this.check();
             
             % Get input lengths
-            N = size(this.X,2); 
+            N = size(this.X,2);
+            m = size(this.XI,2);
             nx = size(x_star,2);
             
             if abs(round(NumBatches)-NumBatches)>1e-16
@@ -192,7 +196,7 @@ classdef SubsetRegressor < tacopig.gp.GpCore
             % we are currently handling the possibility of multi-task with
             % common points as a general case of GP_Std
             mu_0 = this.MeanFn.eval(x_star, this);
-            noise = this.NoiseFn.eval(this.X, this);
+            noise = this.NoiseFn.eval(1, this);
             
             partitions = round(linspace(1, nx+1, NumBatches+1));
             
@@ -215,8 +219,8 @@ classdef SubsetRegressor < tacopig.gp.GpCore
                 mu_star(LR) = mu_0(LR) + (ks*this.palpha)';
 
                 if (nargout>=2)
-                    vs = (noise^2)*sum((ks.*(ks*this.invK))',1);
-                    var_star(LR) = max(0, vs + this.noisepar^2);
+                    vs = noise*sum((ks.*(ks*this.invK))',1);
+                    var_star(LR) = max(0, vs + noise);
                 end
 
             end

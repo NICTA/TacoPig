@@ -9,16 +9,16 @@ function [nlml, nlmlg] = SR_LMLG(this, parvec)
     D = size(this.X,1);
     ncovpar = this.CovFn.npar(D);
     nmeanpar = this.MeanFn.npar(D);
-    nnoisepar = 1;
+    nnoisepar = this.NoiseFn.npar;
     
     this.meanpar = parvec(1:nmeanpar);
     this.covpar = parvec(nmeanpar+1:nmeanpar+ncovpar);
     this.noisepar = parvec(nmeanpar+ncovpar+1:nmeanpar+ncovpar+nnoisepar);
     
     % cut and pasted from solve
-    mu = this.MeanFn.eval_y(this.X, this.meanpar);
-    KI  = this.CovFn.Keval(this.XI, this.covpar);
-    KIX = this.CovFn.eval(this.XI, this.X, this.covpar);
+    mu = this.MeanFn.eval(this.X, this);
+    KI  = this.CovFn.Keval(this.XI, this);
+    KIX = this.CovFn.eval(this.XI, this.X, this);
 
     % add a tiny noise to KI to keep positive definiteness
     eps = 1e-6*sum(diag(KI)); % or could use min etc
