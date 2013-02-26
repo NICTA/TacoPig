@@ -32,7 +32,12 @@ n = size(X,2);
 y = y(id);
 
 xstar = linspace(-8, 8, 201); 
-[indxs, induced] = kmeans(X, 10); % only half as many points
+try % pick the induced points. only half as many points in this case.
+    [indxs, induced] = kmeans(X, n/2);
+catch
+%     induced = (rand(10,1)-0.5) *abs(max(X)-min(X))+mean(X) ;
+    induced = [linspace(min(X),max(X),n/2)]';
+end
 % we will now compute the regression over these induced points
 
 
